@@ -1,20 +1,23 @@
 {
-  "updated_utc": "2026-11-16T07:47:13.387441+00:00",
+  "updated_utc": "2026-11-16T11:13:53.515800+00:00",
   "source": "MAST product metadata",
   "total_candidate_obsids": 137,
   "completed_obsids": [
     "109351529",
     "109374093",
-    "141607298"
+    "141607298",
+    "142074818",
+    "142517531"
   ],
-  "failed_obsids": {},
-  "remaining": 134,
-  "science_product_files": 801,
+  "failed_obsids": {
+    "142074951": "Request failed.  If this problem persists, please notify archive[at]stsci.edu.'"
+  },
+  "remaining": 132,
+  "science_product_files": 1379,
   "detector_coverage_verified": false,
   "source_detected": false,
   "processed_this_run": [
-    "109351529",
-    "109374093",
-    "141607298"
+    "142074818",
+    "142517531"
   ]
 }
