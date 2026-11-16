@@ -1,0 +1,4 @@
+astroquery>=0.4.11,<1
+astropy>=6,<8
+shapely>=2,<3
+requests>=2.31,<3
