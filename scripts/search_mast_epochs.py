@@ -215,7 +215,8 @@ def main():
         # Product listing can return the same file from overlapping observation rows.
         uniq = {r["data_uri"] or r["filename"]: r for r in products}
         products = sorted(uniq.values(), key=lambda r: (r["obsid"], r["filename"]))
-        write_csv(root / "science_products.csv", products, prod_fields)
+        if args.include_products or not (root / "science_products.csv").exists():
+            write_csv(root / "science_products.csv", products, prod_fields)
 
         counts = Counter(r["mission"] for _, r in eligible)
         instrument_counts = Counter((r["mission"], r["instrument"]) for _, r in eligible)
