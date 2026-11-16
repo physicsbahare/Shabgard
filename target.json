@@ -1,0 +1,13 @@
+{
+  "name": "Shabgard",
+  "cosmos2025_id": 639188,
+  "ra_deg": 150.0634341,
+  "dec_deg": 2.3552216,
+  "coordinate_status": "provisional_from_previous_conversation_verify_against_COSMOS2025",
+  "search_radius_arcmin": 4,
+  "missions": [
+    "JWST",
+    "HST",
+    "HLA"
+  ]
+}
