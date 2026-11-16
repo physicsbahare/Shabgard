@@ -36,6 +36,10 @@ jobs:
         id: census
         continue-on-error: true
         run: python scripts/search_mast_epochs.py --target target.json --out results
+      - name: Incremental science product metadata retrieval
+        if: steps.census.outcome == 'success'
+        continue-on-error: true
+        run: python scripts/fetch_science_products.py --out results --batch-size 3
       - name: Commit results and query status
         if: always()
         run: |
