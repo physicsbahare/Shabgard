@@ -122,6 +122,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--target", default="target.json")
     ap.add_argument("--out", default="results")
+    ap.add_argument("--include-products", action="store_true", help="Slow, potentially huge MAST product inventory")
     args = ap.parse_args()
     conf = json.loads(Path(args.target).read_text())
     ra, dec = float(conf["ra_deg"]), float(conf["dec_deg"])
@@ -155,7 +156,7 @@ def main():
             )
             if mission in MAIN:
                 observations.append(r)
-                if r["archive_footprint"] != "outside_archive_footprint":
+                if r["archive_footprint"] == "inside_archive_footprint":
                     eligible.append((i, r))
             else:
                 others.append(r)
@@ -190,7 +191,7 @@ def main():
         products, errors = [], []
         # Product metadata is required before per-exposure WCS and centroid work.
         # Request small batches so one timeout does not discard the whole inventory.
-        for off in range(0, len(eligible), 30):
+        for off in range(0, len(eligible), 30) if args.include_products else []:
             indices = [i for i, _ in eligible[off:off + 30]]
             selected = all_rows[indices]
             try:
@@ -226,7 +227,8 @@ def main():
             archive_footprint_hits=sum(r["archive_footprint"] == "inside_archive_footprint" for _, r in eligible),
             candidate_epoch_groups=len(epoch_records),
             science_product_files=len(products),
-            product_query_complete=not errors,
+            product_query_complete=args.include_products and not errors,
+            product_query_deferred=not args.include_products,
             product_query_errors=errors,
         )
         lines = [
@@ -241,10 +243,11 @@ def main():
             "",
             f"- Total raw nearby archive observation records: **{len(all_rows)}**",
             f"- JWST/HST/HLA observation records: **{len(observations)}**",
-            f"- Candidate overlap or unknown footprint: **{len(eligible)}**",
+            f"- Explicit archive-footprint candidate records: **{len(eligible)}**",
             f"- Explicit archive footprint hits: **{status['archive_footprint_hits']}**",
             f"- Date × mission × instrument × filter × program groups: **{len(epoch_records)}**",
             f"- Science FITS products indexed: **{len(products)}**",
+            "- Product metadata retrieval: **deferred** (slow; run separately)" if not args.include_products else "- Product metadata retrieval: requested",
             "",
             "## Mission/instrument breakdown",
             "",
