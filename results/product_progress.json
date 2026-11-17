@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-11-17T13:14:19.198165+00:00",
+  "updated_utc": "2026-11-17T21:46:34.232284+00:00",
   "source": "MAST product metadata",
   "total_candidate_obsids": 137,
   "completed_obsids": [
@@ -18,16 +18,19 @@
     "200464999",
     "200763671",
     "207852140",
-    "207852153"
+    "207852153",
+    "207852283",
+    "207852293",
+    "207853549"
   ],
   "failed_obsids": {},
-  "remaining": 121,
-  "science_product_files": 3133,
+  "remaining": 118,
+  "science_product_files": 3168,
   "detector_coverage_verified": false,
   "source_detected": false,
   "processed_this_run": [
-    "200763671",
-    "207852140",
-    "207852153"
+    "207852283",
+    "207852293",
+    "207853549"
   ]
 }
