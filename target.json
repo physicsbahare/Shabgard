@@ -3,11 +3,13 @@
   "cosmos2025_id": 639188,
   "ra_deg": 150.0634341,
   "dec_deg": 2.3552216,
-  "coordinate_status": "provisional_from_previous_conversation_verify_against_COSMOS2025",
+  "coordinate_status": "verified_against_published_Salmasi_et_al_2026_paper_section_2_2",
   "search_radius_arcmin": 4,
   "missions": [
     "JWST",
     "HST",
     "HLA"
-  ]
+  ],
+  "coordinate_reference": "Salmasi et al. 2026, arXiv:2610.07861v1, Section 2.2, printed page 4: COSMOS2025 ID 639188",
+  "catalog_astrometric_reference_epoch": "not_specified_in_paper_check_catalog_metadata_before_propagating_HST_positions"
 }
