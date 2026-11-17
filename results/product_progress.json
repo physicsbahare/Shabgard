@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-11-16T21:05:16.276117+00:00",
+  "updated_utc": "2026-11-17T00:20:12.065584+00:00",
   "source": "MAST product metadata",
   "total_candidate_obsids": 137,
   "completed_obsids": [
@@ -7,19 +7,21 @@
     "109374093",
     "141607298",
     "142074818",
+    "142074951",
     "142517531",
     "143779415",
-    "192782598"
+    "192782598",
+    "199805431",
+    "199805440"
   ],
-  "failed_obsids": {
-    "142074951": "502 Server Error: Bad Gateway for url: https://mast.stsci.edu/portal/Mashup/Mashup.asmx/columnsconfig"
-  },
-  "remaining": 130,
-  "science_product_files": 2532,
+  "failed_obsids": {},
+  "remaining": 127,
+  "science_product_files": 2943,
   "detector_coverage_verified": false,
   "source_detected": false,
   "processed_this_run": [
-    "143779415",
-    "192782598"
+    "142074951",
+    "199805431",
+    "199805440"
   ]
 }
