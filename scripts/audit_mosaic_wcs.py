@@ -106,7 +106,8 @@ def main():
     products=list(csv.DictReader((root/"science_products.csv").open()))
     selected=[]
     for p in products:
-        obs=observations.get(p.get("obsid",""))
+        obs=observations.get(p.get("query_obsid",""))
+        # MAST product obsID often differs from the parent archive obsid.
         if not obs: continue
         if not p.get("filename","").lower().endswith(SUFFIXES): continue
         if p.get("rights","").lower() not in ("","public"): continue
