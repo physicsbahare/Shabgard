@@ -3143,6 +3143,15 @@ obsid,filename,data_uri,product_type,subgroup,size_bytes,rights
 207852283,hst_9822_5e_wfpc2_pc_f300w_u8pu5e_drz.fits,mast:HST/product/hst_9822_5e_wfpc2_pc_f300w_u8pu5e_drz.fits,SCIENCE,DRZ,277257600,PUBLIC
 207852293,hst_9822_5e_wfpc2_pc_total_u8pu5e_drz.fits,mast:HST/product/hst_9822_5e_wfpc2_pc_total_u8pu5e_drz.fits,SCIENCE,DRZ,277257600,PUBLIC
 207853549,hst_9822_3x_wfpc2_pc_f300w_u8pu3x_drz.fits,mast:HST/product/hst_9822_3x_wfpc2_pc_f300w_u8pu3x_drz.fits,SCIENCE,DRZ,277318080,PUBLIC
+207853558,hst_9822_3x_wfpc2_pc_total_u8pu3x_drz.fits,mast:HST/product/hst_9822_3x_wfpc2_pc_total_u8pu3x_drz.fits,SCIENCE,DRZ,277318080,PUBLIC
+208073188,hst_11289_02_wfpc2_pc_f606w_ua1n0201_drz.fits,mast:HST/product/hst_11289_02_wfpc2_pc_f606w_ua1n0201_drz.fits,SCIENCE,DRZ,166524480,PUBLIC
+208073188,hst_11289_02_wfpc2_pc_f606w_ua1n0201_flt.fits,mast:HST/product/hst_11289_02_wfpc2_pc_f606w_ua1n0201_flt.fits,SCIENCE,FLT,25882560,PUBLIC
+208073198,hst_11289_02_wfpc2_pc_f606w_ua1n0203_drz.fits,mast:HST/product/hst_11289_02_wfpc2_pc_f606w_ua1n0203_drz.fits,SCIENCE,DRZ,166524480,PUBLIC
+208073198,hst_11289_02_wfpc2_pc_f606w_ua1n0203_flt.fits,mast:HST/product/hst_11289_02_wfpc2_pc_f606w_ua1n0203_flt.fits,SCIENCE,FLT,25882560,PUBLIC
+208073213,hst_11289_02_wfpc2_pc_f606w_ua1n0202_drz.fits,mast:HST/product/hst_11289_02_wfpc2_pc_f606w_ua1n0202_drz.fits,SCIENCE,DRZ,166524480,PUBLIC
+208073213,hst_11289_02_wfpc2_pc_f606w_ua1n0202_flt.fits,mast:HST/product/hst_11289_02_wfpc2_pc_f606w_ua1n0202_flt.fits,SCIENCE,FLT,25882560,PUBLIC
+208073223,hst_11289_02_wfpc2_pc_total_ua1n02_drz.fits,mast:HST/product/hst_11289_02_wfpc2_pc_total_ua1n02_drz.fits,SCIENCE,DRZ,166556160,PUBLIC
+208074344,hst_11289_02_wfpc2_pc_f606w_ua1n02_drz.fits,mast:HST/product/hst_11289_02_wfpc2_pc_f606w_ua1n02_drz.fits,SCIENCE,DRZ,166556160,PUBLIC
 24675186,u8pu3x01m_c0f.fits,mast:HST/product/u8pu3x01m_c0f.fits,SCIENCE,C0F,10307520,PUBLIC
 24675186,u8pu3x01m_flt.fits,mast:HST/product/u8pu3x01m_flt.fits,SCIENCE,FLT,25885440,PUBLIC
 24675187,u8pu3x02m_c0f.fits,mast:HST/product/u8pu3x02m_c0f.fits,SCIENCE,C0F,10307520,PUBLIC
@@ -3167,3 +3176,9 @@ obsid,filename,data_uri,product_type,subgroup,size_bytes,rights
 24675400,u8pu5e03m_flt.fits,mast:HST/product/u8pu5e03m_flt.fits,SCIENCE,FLT,25882560,PUBLIC
 24675401,u8pu5e04m_c0f.fits,mast:HST/product/u8pu5e04m_c0f.fits,SCIENCE,C0F,10307520,PUBLIC
 24675401,u8pu5e04m_flt.fits,mast:HST/product/u8pu5e04m_flt.fits,SCIENCE,FLT,25885440,PUBLIC
+24713400,ua1n0201m_c0f.fits,mast:HST/product/ua1n0201m_c0f.fits,SCIENCE,C0F,10307520,PUBLIC
+24713400,ua1n0201m_flt.fits,mast:HST/product/ua1n0201m_flt.fits,SCIENCE,FLT,25882560,PUBLIC
+24713401,ua1n0202m_c0f.fits,mast:HST/product/ua1n0202m_c0f.fits,SCIENCE,C0F,10307520,PUBLIC
+24713401,ua1n0202m_flt.fits,mast:HST/product/ua1n0202m_flt.fits,SCIENCE,FLT,25882560,PUBLIC
+24713402,ua1n0203m_c0f.fits,mast:HST/product/ua1n0203m_c0f.fits,SCIENCE,C0F,10307520,PUBLIC
+24713402,ua1n0203m_flt.fits,mast:HST/product/ua1n0203m_flt.fits,SCIENCE,FLT,25882560,PUBLIC
