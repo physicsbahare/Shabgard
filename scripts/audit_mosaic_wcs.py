@@ -112,8 +112,14 @@ def main():
         if not p.get("filename","").lower().endswith(SUFFIXES): continue
         if p.get("rights","").lower() not in ("","public"): continue
         selected.append((priority(obs),obs,p))
-    selected.sort(key=lambda x:(x[0],x[1].get("date_start_utc",""),
-                                x[2].get("filename","")))
+    # Audit one representative full visit mosaic per candidate obsid first;
+    # then visit-level detector mosaics. This avoids wasting the first
+    # batch on dozens of dither/module files from a single visit.
+    def audit_rank(entry):\n        priority_group, obs, product = entry\n        name = product.get("filename", "").lower()\n        is_visit_mosaic = name.startswith(obs.get("obs_id", "").lower())\n        return (priority_group, 0 if is_visit_mosaic else 1,\n                obs.get("date_start_utc", ""), name)\n    selected.sort(key=audit_rank)
+    unique_first=[]\n    seen_obs=set()\n    for entry in selected:
+        key=entry[1].get("obsid", "")\n        if key not in seen_obs:\n            unique_first.append(entry)
+            seen_obs.add(key)
+    selected=unique_first+[entry for entry in selected if entry not in unique_first]
     path=root/"mosaic_wcs_audit.csv"
     old=list(csv.DictReader(path.open())) if path.exists() else []
     indexed={x["data_uri"]:x for x in old}
