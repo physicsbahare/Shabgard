@@ -164,8 +164,7 @@ def main():
                 available_mosaic_products=len(selected),
                 status_counts=counts,source_detections_confirmed=False,
                 caveat="Mosaic WCS screening is not source detection, detector-cal gWCS, nor an independent parallax epoch. Approximate PM reference epoch 2023.99.")
-    (root/"mosaic_wcs_summary.json").write_text(json.dumps(report,indent=2)+"
-")
+    (root/"mosaic_wcs_summary.json").write_text(json.dumps(report,indent=2)+"\n")
     print(json.dumps(report,indent=2))
 
 if __name__=="__main__":main()
