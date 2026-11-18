@@ -21,7 +21,7 @@ concurrency:
 jobs:
   mast-inventory:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,7 +39,11 @@ jobs:
       - name: Incremental science product metadata retrieval
         if: steps.census.outcome == 'success'
         continue-on-error: true
-        run: python scripts/fetch_science_products.py --out results --batch-size 3
+        run: python scripts/fetch_science_products.py --out results --batch-size 32
+      - name: Fast mosaic-WCS coverage audit (priority JWST 7814 and MIRI)
+        if: steps.census.outcome == 'success'
+        continue-on-error: true
+        run: python scripts/audit_mosaic_wcs.py --out results --target target.json --limit 18 --timeout 35
       - name: Commit results and query status
         if: always()
         run: |
