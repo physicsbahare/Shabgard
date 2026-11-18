@@ -1,10 +1,10 @@
 {
-  "updated_utc": "2026-11-18T10:35:41.416856+00:00",
-  "audited_mosaic_products": 12,
-  "checked_this_run": 12,
-  "available_mosaic_products": 2575,
+  "updated_utc": "2026-11-18T11:59:08.021855+00:00",
+  "audited_mosaic_products": 36,
+  "checked_this_run": 24,
+  "available_mosaic_products": 5377,
   "status_counts": {
-    "inside_mosaic_image_wcs": 1,
+    "inside_mosaic_image_wcs": 25,
     "outside_mosaic_image_wcs_for_proxy": 11
   },
   "source_detections_confirmed": false,

@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-11-18T11:18:27.512986+00:00",
+  "updated_utc": "2026-11-18T11:59:02.143933+00:00",
   "source": "MAST product metadata",
   "total_candidate_obsids": 137,
   "completed_obsids": [
@@ -17,9 +17,17 @@
     "200464999",
     "200763671",
     "214713371",
+    "215507840",
     "234388089",
     "234492195",
+    "23877854",
+    "23877855",
+    "24801622",
+    "24801623",
+    "258574560",
+    "258844053",
     "262051262",
+    "355535296",
     "372523982",
     "372524111",
     "400106987",
@@ -31,26 +39,23 @@
     "400713729",
     "400713730"
   ],
-  "failed_obsids": {},
-  "remaining": 110,
-  "science_product_files": 14145,
+  "failed_obsids": {
+    "226940194": "HTTPSConnectionPool(host='mast.stsci.edu', port=443): Read timed out. (read timeout=None)",
+    "260189003": "HTTPSConnectionPool(host='mast.stsci.edu', port=443): Read timed out. (read timeout=None)"
+  },
+  "remaining": 102,
+  "science_product_files": 16342,
   "detector_coverage_verified": false,
   "source_detected": false,
   "processed_this_run": [
-    "400713730",
-    "262051262",
-    "372523982",
-    "372524111",
-    "141607298",
-    "142074818",
-    "142074951",
-    "142517531",
-    "143779415",
-    "199805431",
-    "199805440",
-    "199805450",
-    "199805452",
-    "214713371"
+    "215507840",
+    "258574560",
+    "258844053",
+    "355535296",
+    "23877854",
+    "23877855",
+    "24801622",
+    "24801623"
   ],
   "priority": "JWST 7814 NIRCam, JWST MIRI, other JWST NIRCam, HST WFC3/IR, other"
 }
