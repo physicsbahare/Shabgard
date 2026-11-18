@@ -76,7 +76,7 @@ def main():
     n=0
     for r in candidates:
         if r.get("wcs_status")!="inside_mosaic_image_wcs":continue
-        if r["data_uri"] in existing:continue
+        if r["data_uri"] in existing and existing[r["data_uri"]].get("pixel_status") not in ("no_sci_hdu","no_image_hdu","remote_error_or_timeout"):continue
         out={k:r.get(k,"") for k in FIELDS}
         try:out.update(sample(r,args.timeout))
         except Exception as exc:out.update(pixel_status="remote_error_or_timeout",error=(type(exc).__name__+": "+str(exc))[:250])
