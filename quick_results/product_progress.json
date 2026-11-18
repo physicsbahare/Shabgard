@@ -1,0 +1,43 @@
+{
+  "updated_utc": "2026-11-18T10:35:39.121163+00:00",
+  "source": "MAST product metadata",
+  "total_candidate_obsids": 137,
+  "completed_obsids": [
+    "109351529",
+    "109374093",
+    "200464999",
+    "200763671",
+    "234388089",
+    "234492195",
+    "400106987",
+    "400162856",
+    "400193182",
+    "400243108",
+    "400697194",
+    "400697825",
+    "400713729"
+  ],
+  "failed_obsids": {
+    "400713730": "HTTPSConnectionPool(host='mast.stsci.edu', port=443): Read timed out. (read timeout=None)"
+  },
+  "remaining": 124,
+  "science_product_files": 7699,
+  "detector_coverage_verified": false,
+  "source_detected": false,
+  "processed_this_run": [
+    "400106987",
+    "400162856",
+    "400193182",
+    "400243108",
+    "400697194",
+    "400697825",
+    "400713729",
+    "109351529",
+    "109374093",
+    "200464999",
+    "200763671",
+    "234388089",
+    "234492195"
+  ],
+  "priority": "JWST 7814 NIRCam, JWST MIRI, other JWST NIRCam, HST WFC3/IR, other"
+}

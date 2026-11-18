@@ -1,0 +1,12 @@
+{
+  "updated_utc": "2026-11-18T10:35:41.416856+00:00",
+  "audited_mosaic_products": 12,
+  "checked_this_run": 12,
+  "available_mosaic_products": 2575,
+  "status_counts": {
+    "inside_mosaic_image_wcs": 1,
+    "outside_mosaic_image_wcs_for_proxy": 11
+  },
+  "source_detections_confirmed": false,
+  "caveat": "Mosaic WCS screening is not source detection, detector-cal gWCS, nor an independent parallax epoch. Approximate PM reference epoch 2023.99."
+}
