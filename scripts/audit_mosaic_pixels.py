@@ -29,7 +29,11 @@ def sample(row, timeout):
                        fsspec_kwargs={"block_size":262144},
                        lazy_load_hdus=True,memmap=False) as hdul:
             sci=next((h for h in hdul if h.name=="SCI" and h.header.get("NAXIS",0)>=2),None)
-            if sci is None: return dict(pixel_status="no_sci_hdu",error="No SCI image")
+            # HLA drizzled WFC3/IR products may store their science image
+            # in the primary HDU, unlike JWST i2d products.
+            if sci is None and hdul[0].header.get("NAXIS",0)>=2:
+                sci=hdul[0]
+            if sci is None: return dict(pixel_status="no_image_hdu",error="No 2D SCI or primary image")
             nx=int(sci.header["NAXIS1"]);ny=int(sci.header["NAXIS2"])
             ix=int(round(x));iy=int(round(y))
             if ix<0 or iy<0 or ix>=nx or iy>=ny:
