@@ -47,7 +47,7 @@ jobs:
       - name: Check actual SCI and WHT pixels at Shabgard position
         if: steps.census.outcome == 'success'
         continue-on-error: true
-        run: python scripts/audit_mosaic_pixels.py --out results --limit 12 --timeout 30
+        run: python scripts/audit_mosaic_pixels.py --out results --limit 24 --timeout 25
       - name: Commit results and query status
         if: always()
         run: |
