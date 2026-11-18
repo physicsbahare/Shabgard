@@ -115,9 +115,19 @@ def main():
     # Audit one representative full visit mosaic per candidate obsid first;
     # then visit-level detector mosaics. This avoids wasting the first
     # batch on dozens of dither/module files from a single visit.
-    def audit_rank(entry):\n        priority_group, obs, product = entry\n        name = product.get("filename", "").lower()\n        is_visit_mosaic = name.startswith(obs.get("obs_id", "").lower())\n        return (priority_group, 0 if is_visit_mosaic else 1,\n                obs.get("date_start_utc", ""), name)\n    selected.sort(key=audit_rank)
-    unique_first=[]\n    seen_obs=set()\n    for entry in selected:
-        key=entry[1].get("obsid", "")\n        if key not in seen_obs:\n            unique_first.append(entry)
+    def audit_rank(entry):
+        priority_group, obs, product = entry
+        name = product.get("filename", "").lower()
+        is_visit_mosaic = name.startswith(obs.get("obs_id", "").lower())
+        return (priority_group, 0 if is_visit_mosaic else 1,
+                obs.get("date_start_utc", ""), name)
+    selected.sort(key=audit_rank)
+    unique_first=[]
+    seen_obs=set()
+    for entry in selected:
+        key=entry[1].get("obsid", "")
+        if key not in seen_obs:
+            unique_first.append(entry)
             seen_obs.add(key)
     selected=unique_first+[entry for entry in selected if entry not in unique_first]
     path=root/"mosaic_wcs_audit.csv"
@@ -154,7 +164,8 @@ def main():
                 available_mosaic_products=len(selected),
                 status_counts=counts,source_detections_confirmed=False,
                 caveat="Mosaic WCS screening is not source detection, detector-cal gWCS, nor an independent parallax epoch. Approximate PM reference epoch 2023.99.")
-    (root/"mosaic_wcs_summary.json").write_text(json.dumps(report,indent=2)+"\n")
+    (root/"mosaic_wcs_summary.json").write_text(json.dumps(report,indent=2)+"
+")
     print(json.dumps(report,indent=2))
 
 if __name__=="__main__":main()
