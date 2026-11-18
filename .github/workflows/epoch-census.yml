@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: shabgard-archive-census
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   mast-inventory:
@@ -56,8 +56,15 @@ jobs:
           git add results/ || true
           if ! git diff --cached --quiet; then
             git commit -m "Refresh Shabgard HST/JWST MAST epoch census"
-            git pull --rebase origin main
-            git push origin main
+            # Prefer this run's regenerated outputs on content conflicts.
+            # Concurrency cancellation prevents overlapping census writers.
+            git pull --rebase -X theirs origin main
+            for attempt in 1 2 3; do
+              if git push origin main; then exit 0; fi
+              git pull --rebase -X theirs origin main
+              sleep 3
+            done
+            exit 1
           fi
       - name: Fail if MAST query failed
         if: steps.census.outcome != 'success'
