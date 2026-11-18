@@ -1,5 +1,5 @@
 {
-  "query_started_utc": "2026-11-18T17:56:44+00:00",
+  "query_started_utc": "2026-11-18T17:57:28+00:00",
   "ra_deg": 150.0634341,
   "dec_deg": 2.3552216,
   "coordinate_status": "verified_against_published_Salmasi_et_al_2026_paper_section_2_2",
@@ -7,7 +7,7 @@
   "source": "MAST / astroquery.mast",
   "ok": true,
   "product_query_complete": false,
-  "query_completed_utc": "2026-11-18T17:57:08+00:00",
+  "query_completed_utc": "2026-11-18T17:57:33+00:00",
   "raw_observation_count": 7245,
   "scoped_observation_count": 5116,
   "candidate_footprint_records": 137,
