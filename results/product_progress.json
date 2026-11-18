@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-11-18T15:39:51.003819+00:00",
+  "updated_utc": "2026-11-18T16:29:36.335817+00:00",
   "source": "MAST product metadata",
   "total_candidate_obsids": 137,
   "completed_obsids": [
@@ -146,26 +146,6 @@
   "science_product_files": 19134,
   "detector_coverage_verified": false,
   "source_detected": false,
-  "processed_this_run": [
-    "359457267",
-    "359457297",
-    "359457324",
-    "378645306",
-    "378645307",
-    "378645308",
-    "68716511",
-    "68716513",
-    "68716520",
-    "68716526",
-    "68716533",
-    "68716538",
-    "68716546",
-    "68716556",
-    "68716566",
-    "68716591",
-    "68716609",
-    "68716616",
-    "83207656"
-  ],
+  "processed_this_run": [],
   "priority": "JWST 7814 NIRCam, JWST MIRI, other JWST NIRCam, HST WFC3/IR, other"
 }
