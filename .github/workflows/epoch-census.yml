@@ -44,6 +44,10 @@ jobs:
         if: steps.census.outcome == 'success'
         continue-on-error: true
         run: python scripts/audit_mosaic_wcs.py --out results --target target.json --limit 18 --timeout 35
+      - name: Check actual SCI and WHT pixels at Shabgard position
+        if: steps.census.outcome == 'success'
+        continue-on-error: true
+        run: python scripts/audit_mosaic_pixels.py --out results --limit 12 --timeout 30
       - name: Commit results and query status
         if: always()
         run: |
