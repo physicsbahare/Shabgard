@@ -52,7 +52,8 @@ jobs:
           git add results/ || true
           if ! git diff --cached --quiet; then
             git commit -m "Refresh Shabgard HST/JWST MAST epoch census"
-            git push
+            git pull --rebase origin main
+            git push origin main
           fi
       - name: Fail if MAST query failed
         if: steps.census.outcome != 'success'
