@@ -31,7 +31,7 @@ jobs:
       - name: Retrieve priority JWST 7814 and MIRI FITS product metadata
         run: python scripts/fetch_science_products.py --out quick_results --batch-size 14
       - name: Verify FITS image WCS footprints for priority products
-        run: python scripts/audit_mosaic_wcs.py --out quick_results --target target.json --limit 12 --timeout 25
+        run: python scripts/audit_mosaic_wcs.py --out quick_results --target target.json --limit 24 --timeout 25
       - name: Commit priority coverage evidence without touching main results
         if: always()
         run: |
