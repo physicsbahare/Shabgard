@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from astroquery.mast import Observations
 
-FIELDS = ["obsid", "filename", "data_uri", "product_type", "subgroup", "size_bytes", "rights"]
+FIELDS = ["query_obsid", "obsid", "filename", "data_uri", "product_type", "subgroup", "size_bytes", "rights"]
 SUFFIX = ("_cal.fits", "_rate.fits", "_i2d.fits", "_drz.fits", "_drc.fits",
           "_flt.fits", "_flc.fits", "_s2d.fits", "_x1d.fits", "_c0f.fits")
 def value(row, name):
@@ -75,7 +75,7 @@ def main():
                 filename = value(p, "productFilename")
                 if not filename.lower().endswith(SUFFIX):
                     continue
-                record = dict(obsid=value(p, "obsID"), filename=filename,
+                record = dict(query_obsid=oid, obsid=value(p, "obsID"), filename=filename,
                               data_uri=value(p, "dataURI"),
                               product_type=value(p, "productType"),
                               subgroup=value(p, "productSubGroupDescription"),
@@ -90,7 +90,7 @@ def main():
         finally:
             signal.alarm(0)
         time.sleep(0.25)
-    write_csv(product_path, sorted(indexed.values(), key=lambda r:(r["obsid"],r["filename"])))
+    write_csv(product_path, sorted(indexed.values(), key=lambda r:(r.get("query_obsid", ""), r["obsid"],r["filename"])))
     progress = dict(updated_utc=datetime.now(timezone.utc).isoformat(),
                     source="MAST product metadata", total_candidate_obsids=len(obsids),
                     completed_obsids=sorted(completed), failed_obsids=failures,
