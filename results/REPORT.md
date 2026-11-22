@@ -1,14 +1,14 @@
 # Shabgard: MAST observation census
 
-MAST query: 2026-11-22T03:02:41+00:00 (UTC), radius 4.0 arcmin
+MAST query: 2026-11-22T11:10:09+00:00 (UTC), radius 4.0 arcmin
 Coordinates: RA 150.06343410 deg, Dec 2.35522160 deg (**verified_against_published_Salmasi_et_al_2026_paper_section_2_2**)
 
 > **Important:** These are archive-level footprint candidates, NOT verified
 > target detections or independent high-precision astrometric epochs.
 > The single-image detector WCS, gaps, SNR and target centroid remain to be checked.
 
-- Total raw nearby archive observation records: **7242**
-- JWST/HST/HLA observation records: **5113**
+- Total raw nearby archive observation records: **7241**
+- JWST/HST/HLA observation records: **5112**
 - Explicit archive-footprint candidate records: **137**
 - Explicit archive footprint hits: **137**
 - Date × mission × instrument × filter × program groups: **85**
