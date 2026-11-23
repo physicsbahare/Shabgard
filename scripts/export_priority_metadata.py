@@ -1,62 +1,146 @@
 #!/usr/bin/env python3
-"""Generate small, inspectable priority subsets from the large MAST CSV outputs.
+"""Exact, archive-footprint-only priority metadata for Shabgard.
 
-This is metadata triage only. It does not establish detector coverage or detection.
+No substring-search of arbitrary CSV cells: program, mission and instrument
+must be joined using the observation-level obsid. In particular, a file size
+containing '7814' is NOT evidence for JWST program 7814.
 """
 import argparse
+import collections
 import csv
 import json
 from pathlib import Path
 
-PRIORITIES = [
-    ("JWST_7814", ("7814",)),
-    ("MIRI", ("MIRI", "F770W", "F1000W", "F1280W", "F1500W", "F1800W", "F2100W", "F2550W")),
-    ("HST_WFC3_IR", ("WFC3/IR", "WFC3_IR", "WFC3 IR", "F125W", "F140W", "F160W")),
-]
-MAX_ROWS = 80
+GROUPS = ("JWST_7814_NIRCAM", "MIRI_IMAGE", "HST_WFC3_IR", "JWST_1727_NIRCAM")
 
 
-def read_and_select(path, output_dir):
-    if not path.exists():
-        return {"file": str(path), "error": "missing"}
-    with path.open(newline="", encoding="utf-8-sig") as handle:
-        reader = csv.DictReader(handle)
-        if not reader.fieldnames:
-            return {"file": str(path), "error": "no CSV header"}
-        columns = reader.fieldnames
-        selected = {name: [] for name, _ in PRIORITIES}
-        totals = {name: 0 for name, _ in PRIORITIES}
-        for row in reader:
-            # Inspect all metadata fields, not just an assumed column schema.
-            value = " ".join(str(v or "") for v in row.values()).upper()
-            for name, needles in PRIORITIES:
-                if any(needle.upper() in value for needle in needles):
-                    totals[name] += 1
-                    if len(selected[name]) < MAX_ROWS:
-                        selected[name].append(row)
-    for name, rows in selected.items():
-        target = output_dir / f"{path.stem}_{name.lower()}_sample.csv"
-        with target.open("w", newline="", encoding="utf-8") as handle:
-            writer = csv.DictWriter(handle, fieldnames=columns, extrasaction="ignore")
-            writer.writeheader()
-            writer.writerows(rows)
-    return {"file": str(path), "columns": columns,
-            "matching_rows": totals, "sample_limit_per_priority": MAX_ROWS}
+def group_for_observation(row):
+    if row.get("archive_footprint") != "inside_archive_footprint":
+        return None
+    mission = row.get("mission", "").upper()
+    inst = row.get("instrument", "").upper()
+    proposal = row.get("proposal", "").strip()
+    kind = row.get("dataproduct_type", "").lower()
+    if kind and kind != "image":
+        return None
+    if mission == "JWST" and "NIRCAM" in inst and "GRISM" not in inst:
+        if proposal == "7814":
+            return "JWST_7814_NIRCAM"
+        if proposal == "1727":
+            return "JWST_1727_NIRCAM"
+    if mission == "JWST" and "MIRI/IMAGE" in inst:
+        return "MIRI_IMAGE"
+    if mission == "HST" and "WFC3/IR" in inst:
+        return "HST_WFC3_IR"
+    return None
+
+
+def is_valid_product(row, group):
+    fname = row.get("filename", "").lower()
+    if row.get("rights", "PUBLIC").upper() not in ("PUBLIC", ""):
+        return False
+    if row.get("product_type", "").upper() not in ("SCIENCE", ""):
+        return False
+    if group in ("JWST_7814_NIRCAM", "JWST_1727_NIRCAM"):
+        proposal = "07814" if group == "JWST_7814_NIRCAM" else "01727"
+        return fname.startswith("jw" + proposal) and fname.endswith("_cal.fits") and "_nrc" in fname
+    if group == "MIRI_IMAGE":
+        return fname.endswith("_cal.fits") and "_mirimage_" in fname
+    if group == "HST_WFC3_IR":
+        # Only individual WFC3 exposures count as detector-level candidates.
+        # HLA DRZ products can be retained for separate mosaic checks, NOT here.
+        return fname.endswith(("_flt.fits", "_flc.fits"))
+    return False
+
+
+def load_csv(path):
+    with path.open(newline="", encoding="utf-8-sig") as f:
+        return list(csv.DictReader(f))
+
+
+def write_csv(path, rows, columns):
+    with path.open("w", newline="", encoding="utf-8") as f:
+        wr = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
+        wr.writeheader()
+        wr.writerows(rows)
+
+
+def export(root, out):
+    observations = load_csv(root / "observations.csv")
+    products = load_csv(root / "science_products.csv")
+    by_obsid = collections.defaultdict(list)
+    selected_obs = []
+    for row in observations:
+        group = group_for_observation(row)
+        if not group:
+            continue
+        obsid = row.get("obsid", "")
+        if not obsid:
+            continue
+        selected_obs.append({"priority_group": group, **row})
+        by_obsid[obsid].append((group, row))
+    selected_prod = []
+    counts = collections.Counter()
+    unmatched = collections.Counter()
+    for product in products:
+        oid = product.get("query_obsid", "")
+        if not oid or oid not in by_obsid:
+            if product.get("filename", "").lower().endswith(("_cal.fits", "_flt.fits", "_flc.fits")):
+                unmatched["calibrated_product_without_selected_obsid_link"] += 1
+            continue
+        for group, obs in by_obsid[oid]:
+            if not is_valid_product(product, group):
+                continue
+            selected_prod.append({
+                "priority_group": group,
+                "proposal": obs.get("proposal", ""),
+                "instrument": obs.get("instrument", ""),
+                "filter": obs.get("filter", ""),
+                "date_start_utc": obs.get("date_start_utc", ""),
+                "observation_obsid": oid,
+                **product,
+            })
+            counts[group] += 1
+    # Product names alone don't prove detector coverage; avoid duplicate rows
+    # if one obsid occurs multiple times with identical group/filter metadata.
+    selected_prod = list({(r["priority_group"], r["data_uri"], r["filter"]): r
+                          for r in selected_prod}.values())
+    selected_obs.sort(key=lambda r: (GROUPS.index(r["priority_group"]),
+                                     r.get("date_start_utc", ""), r.get("obsid", "")))
+    selected_prod.sort(key=lambda r: (GROUPS.index(r["priority_group"]),
+                                      r.get("date_start_utc", ""), r.get("filter", ""),
+                                      r.get("filename", "")))
+    out.mkdir(parents=True, exist_ok=True)
+    obs_columns = ["priority_group"] + list(observations[0]) if observations else ["priority_group"]
+    prod_columns = ["priority_group", "proposal", "instrument", "filter",
+                    "date_start_utc", "observation_obsid"] + (list(products[0]) if products else [])
+    write_csv(out / "priority_observations.csv", selected_obs, obs_columns)
+    write_csv(out / "priority_calibrated_products.csv", selected_prod, prod_columns)
+    for group in GROUPS:
+        write_csv(out / (group.lower() + "_observations.csv"),
+                  [r for r in selected_obs if r["priority_group"] == group], obs_columns)
+        write_csv(out / (group.lower() + "_products.csv"),
+                  [r for r in selected_prod if r["priority_group"] == group], prod_columns)
+    summary = {
+        "method": "Exact observation metadata group selection, then query_obsid join",
+        "observations_total": len(observations),
+        "science_products_total": len(products),
+        "priority_observations": dict(collections.Counter(r["priority_group"] for r in selected_obs)),
+        "calibrated_products": dict(collections.Counter(r["priority_group"] for r in selected_prod)),
+        "unmatched": dict(unmatched),
+        "scientific_status": "ARCHIVE FOOTPRINT METADATA ONLY; no calibrated detector coverage or detection",
+        "warning": "Some products lack query_obsid; they are deliberately not assumed to overlap Shabgard."
+    }
+    (out / "schema_and_counts.json").write_text(json.dumps(summary, indent=2) + "\n")
+    return summary
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--results", default="results")
-    ap.add_argument("--out", default="results/priority_metadata")
-    args = ap.parse_args()
-    directory = Path(args.out)
-    directory.mkdir(parents=True, exist_ok=True)
-    reports = [read_and_select(Path(args.results) / filename, directory)
-               for filename in ("observations.csv", "science_products.csv")]
-    (directory / "schema_and_counts.json").write_text(
-        json.dumps(reports, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    for report in reports:
-        print(report["file"], report.get("matching_rows", report.get("error")))
+    p = argparse.ArgumentParser()
+    p.add_argument("--results", default="results")
+    p.add_argument("--out", default="priority_metadata")
+    a = p.parse_args()
+    print(json.dumps(export(Path(a.results), Path(a.out)), indent=2))
 
 
 if __name__ == "__main__":
