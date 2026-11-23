@@ -43,11 +43,17 @@ def exposure_mjd(primary, science):
     for hdr in (science, primary):
         if "EXPSTART" in hdr:
             raise ValueError("Only exposure start MJD found; midpoint cannot be verified")
+    # DATE-OBS/TIME-OBS normally describe the exposure START, not its midpoint.
+    # Never silently use start-of-exposure as an astrometric epoch.
     for hdr in (science, primary):
         date = hdr.get("DATE-OBS")
         if date:
-            return float(Time(date + ("T" + hdr["TIME-OBS"] if "TIME-OBS" in hdr else "")).mjd)
-    raise ValueError("No exposure time found")
+            exptime = hdr.get("EXPTIME", primary.get("EXPTIME"))
+            if exptime is None:
+                raise ValueError("DATE-OBS present but exposure duration unavailable; midpoint unknown")
+            start = float(Time(date + ("T" + hdr["TIME-OBS"] if "TIME-OBS" in hdr else "")).mjd)
+            return start + float(exptime) / 172800.0
+    raise ValueError("No exposure midpoint can be determined")
 
 
 def inspect(path, reference_mjd, radius):
