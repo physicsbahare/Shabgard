@@ -6,6 +6,7 @@ Never equates a MAST footprint, i2d mosaic, or pixel availability with detection
 """
 import argparse
 import csv
+import glob
 import math
 from pathlib import Path
 
@@ -132,7 +133,7 @@ def main():
     args = ap.parse_args()
     if args.radius < 5:
         ap.error("--radius must be at least 5")
-    paths = [p for pattern in args.files for p in sorted(Path().glob(pattern))]
+    paths = [Path(p) for pattern in args.files for p in sorted(glob.glob(pattern))]
     if not paths:
         ap.error("No FITS files matched")
     rows = [inspect(p, args.reference_mjd, args.radius) for p in paths]
