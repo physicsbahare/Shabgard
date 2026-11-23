@@ -30,10 +30,19 @@ def sky_at(mjd, reference_mjd):
 
 
 def exposure_mjd(primary, science):
-    for key in ("EXPSTART", "MJD-AVG", "MJD_AVG"):
-        for hdr in (science, primary):
+    for hdr in (science, primary):
+        for key in ("MJD-AVG", "MJD_AVG", "MJD-MID", "MJD_MID"):
             if key in hdr:
                 return float(hdr[key])
+    for hdr in (science, primary):
+        if "EXPSTART" in hdr and "EXPEND" in hdr:
+            return (float(hdr["EXPSTART"]) + float(hdr["EXPEND"])) / 2.0
+    for hdr in (science, primary):
+        if "EXPSTART" in hdr and "EXPTIME" in hdr:
+            return float(hdr["EXPSTART"]) + float(hdr["EXPTIME"]) / 172800.0
+    for hdr in (science, primary):
+        if "EXPSTART" in hdr:
+            raise ValueError("Only exposure start MJD found; midpoint cannot be verified")
     for hdr in (science, primary):
         date = hdr.get("DATE-OBS")
         if date:
