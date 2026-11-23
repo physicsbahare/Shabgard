@@ -1,0 +1,29 @@
+name: Shabgard priority metadata export
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'results/observations.csv'
+      - 'results/science_products.csv'
+      - 'scripts/export_priority_metadata.py'
+      - '.github/workflows/priority-metadata.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export-priority-metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export bounded priority tables and input schemas
+        run: python scripts/export_priority_metadata.py --results results --out priority_metadata
+      - name: Upload reviewable tables
+        uses: actions/upload-artifact@v4
+        with:
+          name: shabgard-priority-metadata
+          path: priority_metadata/
+          if-no-files-found: error
+          retention-days: 30
