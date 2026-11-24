@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/calibrated-pilot.yml'
+      - 'scripts/audit_calibrated_detector_local.py'
 permissions:
   contents: read
 jobs:
@@ -29,6 +30,7 @@ jobs:
           python scripts/audit_calibrated_detector_local.py 'pilot_data/*_cal.fits' --reference-mjd 60308 --out pilot_results/detector_audit.csv
           echo 'Reference MJD 60308 (2023-12-30) is a hypothesis, not a verified catalog epoch. No noncoverage or detection claim is permitted.' > pilot_results/REFERENCE_WARNING.txt
           cat pilot_results/detector_audit.csv
+          python -c "import csv; r=list(csv.DictReader(open('pilot_results/detector_audit.csv'))); assert len(r)==3 and all(x['good_pixels']=='True' for x in r), 'Pilot did not validate SCI/DQ on all three exposures'"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
