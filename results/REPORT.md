@@ -1,6 +1,6 @@
 # Shabgard: MAST observation census
 
-MAST query: 2026-11-24T17:08:57+00:00 (UTC), radius 4.0 arcmin
+MAST query: 2026-11-24T17:33:46+00:00 (UTC), radius 4.0 arcmin
 Coordinates: RA 150.06343410 deg, Dec 2.35522160 deg (**verified_against_published_Salmasi_et_al_2026_paper_section_2_2**)
 
 > **Important:** These are archive-level footprint candidates, NOT verified
