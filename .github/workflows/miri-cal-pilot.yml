@@ -15,7 +15,7 @@ concurrency:
 jobs:
   miri-cal:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,15 +26,16 @@ jobs:
           python -m pip install 'jwst>=1.17,<3' 'astroquery>=0.4.11,<1' scipy
       - name: Select MIRI CAL with F770W archive fallback
         run: |
-          python scripts/select_miri_cal_pilot.py --results results --out miri_results --max-per-observation 3
+          python scripts/select_miri_cal_pilot.py --results results --out miri_results --max-per-observation 200
           cat miri_results/miri_cal_selection_summary.json
       - name: Download selected detector CAL products
         run: |
-          python scripts/download_miri_cal_batch.py --selection miri_results/miri_cal_selection.csv --out miri_data --report miri_results/miri_download_manifest.csv --max-files 18
+          python scripts/download_miri_cal_batch.py --selection miri_results/miri_cal_selection.csv --out miri_data --report miri_results/miri_download_manifest.csv --max-files 500
       - name: SCI ERR DQ gWCS and local forced-aperture/null tests
         run: |
           python scripts/miri_calibration_pilot.py 'miri_data/*_mirimage_cal.fits' --out miri_results
           cat miri_results/miri_cal_summary.json
+          python -c 'import csv; r=csv.DictReader(open("miri_results/miri_cal_detector_diagnostic.csv")); print(*[x for x in r if x.get("coverage_any_ref_hypothesis")=="True"], sep="\n")'
       - name: Preserve selection and numerical evidence even after failure
         uses: actions/upload-artifact@v4
         if: always()
