@@ -5,13 +5,14 @@ on:
     paths:
       - '.github/workflows/calibrated-pilot.yml'
       - 'scripts/audit_calibrated_detector_local.py'
+      - 'scripts/fit_calibrated_source_pilot.py'
       - 'scripts/localize_f140m.py'
 permissions:
   contents: read
 jobs:
   detector:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,6 +35,10 @@ jobs:
           python -c "import csv; r=list(csv.DictReader(open('pilot_results/detector_audit.csv'))); assert len(r)==3 and all(x['good_pixels']=='True' for x in r), 'Pilot did not validate SCI/DQ on all three exposures'"
       - name: Fit detector source and empirical search controls
         run: python scripts/localize_f140m.py
+      - name: Diagnostic source fit and inter-dither centroid consistency (not claimed as detection)
+        run: |
+          python scripts/fit_calibrated_source_pilot.py 'pilot_data/*_cal.fits' --reference-mjd 60308 --out pilot_results/gaussian_centroid_diagnostic.csv
+          cat pilot_results/gaussian_centroid_diagnostic_summary.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
