@@ -40,7 +40,7 @@ def archive_products(obsid):
     return rows
 
 
-def select(root, out, max_per_filter, include_query):
+def select(root, out, max_per_filter, include_query, filters=None):
     existing = {}
     path = root / "science_products.csv"
     if path.exists():
@@ -50,6 +50,8 @@ def select(root, out, max_per_filter, include_query):
                     existing.setdefault(p.get("query_obsid", ""), []).append(p)
     rows, report = [], []
     for filt, obsid, proposal, date in OBS:
+        if filters is not None and filt not in filters:
+            continue
         products = existing.get(obsid, [])
         source = "persisted_science_products"
         if not products and include_query:
@@ -107,9 +109,10 @@ def main():
     ap.add_argument("--out", default="miri_results")
     ap.add_argument("--max-per-observation", type=int, default=4)
     ap.add_argument("--no-live-query", action="store_true")
+    ap.add_argument("--filters", nargs="+", choices=("F770W","F1000W","F1280W","F1500W"), default=None)
     args = ap.parse_args()
     select(Path(args.results), Path(args.out), args.max_per_observation,
-           not args.no_live_query)
+           not args.no_live_query, args.filters)
 
 
 if __name__ == "__main__":
