@@ -1,0 +1,42 @@
+name: Shabgard MIRI targeted covered-dither followup
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/miri-cal-followup.yml'
+permissions:
+  contents: read
+concurrency:
+  group: shabgard-miri-covered-followup
+  cancel-in-progress: false
+jobs:
+  covered-dithers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install JWST data tools
+        run: python -m pip install 'jwst>=1.17,<3' 'astroquery>=0.4.11,<1' scipy
+      - name: Select exact detector-validated MIRI pointing groups and all their dithers
+        run: |
+          python scripts/select_miri_cal_pilot.py --results results --out miri_results --max-per-observation 8 --filters F770W F1000W F1280W F1500W --obsids 200464999 234492195 372523982 372524111 --pointings jw01727016001 jw05893018008 jw07814004006
+          cat miri_results/miri_cal_selection_summary.json
+      - name: Download full exposure groups
+        run: python scripts/download_miri_cal_batch.py --selection miri_results/miri_cal_selection.csv --out miri_data --report miri_results/miri_download_manifest.csv --max-files 30
+      - name: SCI ERR DQ gWCS and forced aperture with local blank controls
+        run: python scripts/miri_calibration_pilot.py 'miri_data/*_mirimage_cal.fits' --out miri_results
+      - name: Robust Gaussian centroid diagnostic on actual CAL cutouts
+        run: |
+          python scripts/miri_cutout_centroids.py 'miri_results/cutouts/*_local.npz' --out miri_results/miri_gaussian_centroids.csv
+          cat miri_results/miri_cal_summary.json
+          cat miri_results/miri_gaussian_centroids_summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-miri-covered-dithers
+          path: miri_results/
+          if-no-files-found: warn
+          retention-days: 45
