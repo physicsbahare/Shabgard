@@ -62,7 +62,7 @@ def inspect(path, reference_mjd, radius):
                local_snr="", centroid_x="", centroid_y="", detected=False,
                usable_astrometric_epoch=False, reason="")
     try:
-        with fits.open(path, memmap=True) as hdul:
+        with fits.open(path, memmap=False) as hdul:
             p = hdul[0].header
             sci_hdus = [h for h in hdul if h.name == "SCI" and h.data is not None]
             if not sci_hdus:
