@@ -1,0 +1,36 @@
+name: Shabgard calibrated exposure pilot
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/calibrated-pilot.yml'
+permissions:
+  contents: read
+jobs:
+  detector:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install calibrated JWST model tools
+        run: pip install 'jwst>=1.17,<3'
+      - name: Download CAL counterparts of three positive F140M resampled images
+        run: |
+          mkdir -p pilot_data pilot_results
+          for n in 00001 00002 00003; do
+            f="jw07814003013_02201_${n}_nrca1_cal.fits"
+            curl --fail --location --retry 2 --max-time 240 "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:JWST/product/${f}" -o "pilot_data/${f}"
+          done
+      - name: Audit detector gWCS and SCI DQ under provisional reference epoch
+        run: |
+          python scripts/audit_calibrated_detector_local.py 'pilot_data/*_cal.fits' --reference-mjd 60308 --out pilot_results/detector_audit.csv
+          echo 'Reference MJD 60308 (2023-12-30) is a hypothesis, not a verified catalog epoch. No noncoverage or detection claim is permitted.' > pilot_results/REFERENCE_WARNING.txt
+          cat pilot_results/detector_audit.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: calibrated-detector-pilot
+          path: pilot_results/
