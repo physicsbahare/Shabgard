@@ -7,6 +7,7 @@ on:
       - 'scripts/select_miri_cal_pilot.py'
       - 'scripts/download_miri_cal_batch.py'
       - 'scripts/miri_calibration_pilot.py'
+      - 'scripts/miri_cutout_centroids.py'
 permissions:
   contents: read
 concurrency:
@@ -36,6 +37,14 @@ jobs:
           python scripts/miri_calibration_pilot.py 'miri_data/*_mirimage_cal.fits' --out miri_results
           cat miri_results/miri_cal_summary.json
           python -c 'import csv; r=csv.DictReader(open("miri_results/miri_cal_detector_diagnostic.csv")); print(*[x for x in r if x.get("coverage_any_ref_hypothesis")=="True"], sep="\n")'
+      - name: Check candidate centroid consistency across CAL dithers
+        run: |
+          if compgen -G 'miri_results/cutouts/*_local.npz' > /dev/null; then
+            python scripts/miri_cutout_centroids.py 'miri_results/cutouts/*_local.npz' --out miri_results/miri_gaussian_centroids.csv
+            cat miri_results/miri_gaussian_centroids_summary.json
+          else
+            echo 'No covered detector cutouts; centroid fitting not possible in this pilot' > miri_results/NO_CENTROIDS.txt
+          fi
       - name: Preserve selection and numerical evidence even after failure
         uses: actions/upload-artifact@v4
         if: always()
