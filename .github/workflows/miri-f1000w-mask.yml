@@ -1,0 +1,24 @@
+name: Shabgard F1000W mask diagnosis
+on:
+  push:
+    paths:
+      - '.github/workflows/miri-f1000w-mask.yml'
+  workflow_dispatch:
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install 'jwst>=1.17,<3' astroquery scipy
+      - run: python scripts/select_miri_cal_pilot.py --results results --out miri_results --max-per-observation 8 --filters F1000W --obsids 234492195 --pointings jw05893018008
+      - run: python scripts/download_miri_cal_batch.py --max-files 8
+      - run: python scripts/audit_f1000w_masks.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: f1000w-mask-diagnosis
+          path: miri_results/
