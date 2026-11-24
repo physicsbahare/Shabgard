@@ -40,7 +40,7 @@ def archive_products(obsid):
     return rows
 
 
-def select(root, out, max_per_filter, include_query, filters=None):
+def select(root, out, max_per_filter, include_query, filters=None, pointings=None, obsids=None):
     existing = {}
     path = root / "science_products.csv"
     if path.exists():
@@ -52,6 +52,8 @@ def select(root, out, max_per_filter, include_query, filters=None):
     for filt, obsid, proposal, date in OBS:
         if filters is not None and filt not in filters:
             continue
+        if obsids is not None and obsid not in obsids:
+            continue
         products = existing.get(obsid, [])
         source = "persisted_science_products"
         if not products and include_query:
@@ -61,7 +63,8 @@ def select(root, out, max_per_filter, include_query, filters=None):
             except Exception as exc:
                 source = "live_MAST_failed:" + str(exc)[:150]
         products = [p for p in products if p.get("filename", "").endswith("_mirimage_cal.fits")
-                    and p.get("rights", "PUBLIC").upper() in ("PUBLIC", "")]
+                    and p.get("rights", "PUBLIC").upper() in ("PUBLIC", "")
+                    and (pointings is None or p["filename"].split("_")[0] in pointings)]
         # One first exposure from every distinct pointing, then remaining
         # dithers. This covers distinct sky tiles earlier than serial order.
         by_pointing = {}
@@ -110,9 +113,11 @@ def main():
     ap.add_argument("--max-per-observation", type=int, default=4)
     ap.add_argument("--no-live-query", action="store_true")
     ap.add_argument("--filters", nargs="+", choices=("F770W","F1000W","F1280W","F1500W"), default=None)
+    ap.add_argument("--pointings", nargs="+", default=None, help="Exact JWST visit+pointing prefixes from independently tested CAL")
+    ap.add_argument("--obsids", nargs="+", default=None, help="Exact MAST observation IDs")
     args = ap.parse_args()
     select(Path(args.results), Path(args.out), args.max_per_observation,
-           not args.no_live_query, args.filters)
+           not args.no_live_query, args.filters, args.pointings, args.obsids)
 
 
 if __name__ == "__main__":
