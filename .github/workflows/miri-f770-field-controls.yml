@@ -1,0 +1,35 @@
+name: Shabgard MIRI F770W real field controls
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/miri-f770-field-controls.yml'
+      - 'scripts/miri_f770_field_controls.py'
+permissions:
+  contents: read
+jobs:
+  field:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install detector and PSF tools
+        run: python -m pip install 'jwst>=1.17,<3' 'astroquery>=0.4.11,<1' scipy stpsf
+      - name: Select original F770W detector images
+        run: python scripts/select_miri_cal_pilot.py --results results --out miri_results --max-per-observation 8 --filters F770W --obsids 200464999 --pointings jw01727016001
+      - name: Download original calibrated dithers
+        run: python scripts/download_miri_cal_batch.py --selection miri_results/miri_cal_selection.csv --out miri_data --report miri_results/miri_download_manifest.csv --max-files 8
+      - name: Compare field profiles and astrometric offsets
+        run: python scripts/miri_f770_field_controls.py 'miri_data/*_mirimage_cal.fits' --out field_results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-f770-field-controls
+          path: |
+            field_results/
+            miri_results/miri_cal_selection.csv
+            miri_results/miri_download_manifest.csv
+          if-no-files-found: warn
