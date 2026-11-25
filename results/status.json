@@ -1,19 +1,11 @@
 {
-  "query_started_utc": "2026-11-25T12:11:56+00:00",
+  "query_started_utc": "2026-11-25T12:42:38+00:00",
   "ra_deg": 150.0634341,
   "dec_deg": 2.3552216,
   "coordinate_status": "verified_against_published_Salmasi_et_al_2026_paper_section_2_2",
   "radius_arcmin": 4.0,
   "source": "MAST / astroquery.mast",
-  "ok": true,
+  "ok": false,
   "product_query_complete": false,
-  "query_completed_utc": "2026-11-25T12:12:38+00:00",
-  "raw_observation_count": 7239,
-  "scoped_observation_count": 5110,
-  "candidate_footprint_records": 137,
-  "archive_footprint_hits": 137,
-  "candidate_epoch_groups": 85,
-  "science_product_files": 0,
-  "product_query_deferred": true,
-  "product_query_errors": []
+  "error": "RuntimeError: MAST observation query failed: Request failed.  If this problem persists, please notify archive[at]stsci.edu.'"
 }
