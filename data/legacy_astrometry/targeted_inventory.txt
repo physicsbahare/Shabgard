@@ -1,0 +1,164 @@
+STEP 01B: TARGETED COSMOS-Web / v13 inventory (READ ONLY)
+Data root: /mnt/E_202
+
+=== /mnt/E_202/JWST ===
+present=True; files=125257; directories=16; stopped=file_count
+Immediate folders: COSMOS-3D, COSMOS-Web, COSMOS_Web, PANORAMIC, SAPPHIRES, Zhenkai
+Relevant folder examples:
+  /mnt/E_202/JWST/COSMOS-3D
+  /mnt/E_202/JWST/COSMOS-Web
+  /mnt/E_202/JWST/COSMOS_Web
+  /mnt/E_202/JWST/Zhenkai
+  /mnt/E_202/JWST/COSMOS-3D/Unfold
+  /mnt/E_202/JWST/COSMOS-Web/HST_F814W_COSMOSWeb
+  /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics
+  /mnt/E_202/JWST/COSMOS-Web/auxiliary
+  /mnt/E_202/JWST/COSMOS_Web/HST_F814W_v0.5.2026jul
+  /mnt/E_202/JWST/COSMOS_Web/HST_other_filters_private_v0.5.2026jul
+  /mnt/E_202/JWST/Zhenkai/F444W_catalog_update
+  /mnt/E_202/JWST/COSMOS-3D/Unfold/spec_v20250419_dr0_a
+[catalog] total=3
+  6.1188 GB | /mnt/E_202/JWST/Zhenkai/F444W_catalog_update/cosmos_F444W_v13_catalog_v1.fits
+  4.4769 GB | /mnt/E_202/JWST/Zhenkai/F444W_catalog_update/cosmos_F444W_v13_catalog_v1.fits.gz
+  9.5764 GB | /mnt/E_202/JWST/COSMOS-Web/COSMOSWeb_mastercatalog_v1.1.fits
+[candidate_table] total=0
+[science_image] total=83436
+  6.6616 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A10_v1.0_i2d.fits.gz
+  1.2118 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A10_v1.0_sci.fits.gz
+  8.832 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A1_v1.0_i2d.fits.gz
+  1.5968 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A1_v1.0_sci.fits.gz
+  9.1037 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A2_v1.0_i2d.fits.gz
+  1.6557 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A2_v1.0_sci.fits.gz
+  9.1067 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A3_v1.0_i2d.fits.gz
+  1.656 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A3_v1.0_sci.fits.gz
+  9.0862 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A4_v1.0_i2d.fits.gz
+  1.6557 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A4_v1.0_sci.fits.gz
+  6.8789 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A5_v1.0_i2d.fits.gz
+  1.2509 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A5_v1.0_sci.fits.gz
+  8.4798 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A6_v1.0_i2d.fits.gz
+  1.5437 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A6_v1.0_sci.fits.gz
+  8.796 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A7_v1.0_i2d.fits.gz
+  1.6028 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A7_v1.0_sci.fits.gz
+  8.7999 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A8_v1.0_i2d.fits.gz
+  1.603 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A8_v1.0_sci.fits.gz
+  8.7979 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A9_v1.0_i2d.fits.gz
+  1.6024 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A9_v1.0_sci.fits.gz
+  6.8483 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B10_v1.0_i2d.fits.gz
+  1.2436 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B10_v1.0_sci.fits.gz
+  8.5528 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B1_v1.0_i2d.fits.gz
+  1.5545 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B1_v1.0_sci.fits.gz
+  8.9092 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B2_v1.0_i2d.fits.gz
+  1.6171 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B2_v1.0_sci.fits.gz
+  8.9175 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B3_v1.0_i2d.fits.gz
+  1.6071 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B3_v1.0_sci.fits.gz
+  8.888 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B4_v1.0_i2d.fits.gz
+  1.6176 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B4_v1.0_sci.fits.gz
+  6.7196 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B5_v1.0_i2d.fits.gz
+  1.2218 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B5_v1.0_sci.fits.gz
+  8.7697 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B6_v1.0_i2d.fits.gz
+  1.5958 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B6_v1.0_sci.fits.gz
+  9.0813 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B7_v1.0_i2d.fits.gz
+  1.6507 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B7_v1.0_sci.fits.gz
+  9.07 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B8_v1.0_i2d.fits.gz
+  1.6488 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B8_v1.0_sci.fits.gz
+  9.0501 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B9_v1.0_i2d.fits.gz
+  1.6434 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B9_v1.0_sci.fits.gz
+[noise_or_weight] total=165
+  1.0578 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A10_v1.0_err.fits.gz
+  1.102 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A10_v1.0_wht.fits.gz
+  1.4047 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A1_v1.0_err.fits.gz
+  1.4559 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A1_v1.0_wht.fits.gz
+  1.4451 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A2_v1.0_err.fits.gz
+  1.5042 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A2_v1.0_wht.fits.gz
+  1.4455 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A3_v1.0_err.fits.gz
+  1.5024 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A3_v1.0_wht.fits.gz
+  1.4412 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A4_v1.0_err.fits.gz
+  1.5012 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A4_v1.0_wht.fits.gz
+  1.0918 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A5_v1.0_err.fits.gz
+  1.1364 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A5_v1.0_wht.fits.gz
+  1.3449 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A6_v1.0_err.fits.gz
+  1.4017 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A6_v1.0_wht.fits.gz
+  1.3954 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A7_v1.0_err.fits.gz
+  1.4541 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A7_v1.0_wht.fits.gz
+  1.3954 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A8_v1.0_err.fits.gz
+  1.4541 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A8_v1.0_wht.fits.gz
+  1.3961 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A9_v1.0_err.fits.gz
+  1.4546 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A9_v1.0_wht.fits.gz
+  1.0881 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B10_v1.0_err.fits.gz
+  1.1312 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B10_v1.0_wht.fits.gz
+  1.359 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B1_v1.0_err.fits.gz
+  1.4125 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B1_v1.0_wht.fits.gz
+  1.4158 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B2_v1.0_err.fits.gz
+  1.4697 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B2_v1.0_wht.fits.gz
+  1.4214 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B3_v1.0_err.fits.gz
+  1.4751 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B3_v1.0_wht.fits.gz
+  1.4113 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B4_v1.0_err.fits.gz
+  1.4674 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B4_v1.0_wht.fits.gz
+  1.0673 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B5_v1.0_err.fits.gz
+  1.1085 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B5_v1.0_wht.fits.gz
+  1.3923 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B6_v1.0_err.fits.gz
+  1.4476 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B6_v1.0_wht.fits.gz
+  1.4431 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B7_v1.0_err.fits.gz
+  1.4986 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B7_v1.0_wht.fits.gz
+  1.4403 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B8_v1.0_err.fits.gz
+  1.4977 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B8_v1.0_wht.fits.gz
+  1.4379 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B9_v1.0_err.fits.gz
+  1.4945 GB | /mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_B9_v1.0_wht.fits.gz
+[psf] total=2
+  0.0002 GB | /mnt/E_202/JWST/Zhenkai/F444W_catalog_update/psf_F444W_003.fits
+  0.0002 GB | /mnt/E_202/JWST/Zhenkai/psf_F444W_003.fits
+[other_table] total=0
+
+=== /mnt/E_202/zhenkai ===
+present=True; files=0; directories=1; stopped=None
+Immediate folders: 
+Relevant folder examples:
+[catalog] total=0
+[candidate_table] total=0
+[science_image] total=0
+[noise_or_weight] total=0
+[psf] total=0
+[other_table] total=0
+Scan errors:
+Cannot list root: [Errno 13] Permission denied: '/mnt/E_202/zhenkai'
+/mnt/E_202/zhenkai: [Errno 13] Permission denied: '/mnt/E_202/zhenkai'
+
+=== /mnt/E_202/bahareh ===
+present=True; files=0; directories=1; stopped=None
+Immediate folders: 
+Relevant folder examples:
+[catalog] total=0
+[candidate_table] total=0
+[science_image] total=0
+[noise_or_weight] total=0
+[psf] total=0
+[other_table] total=0
+
+=== /mnt/E_202/JWST_Consortium ===
+present=True; files=0; directories=1; stopped=None
+Immediate folders: 
+Relevant folder examples:
+[catalog] total=0
+[candidate_table] total=0
+[science_image] total=0
+[noise_or_weight] total=0
+[psf] total=0
+[other_table] total=0
+Scan errors:
+Cannot list root: [Errno 13] Permission denied: '/mnt/E_202/JWST_Consortium'
+/mnt/E_202/JWST_Consortium: [Errno 13] Permission denied: '/mnt/E_202/JWST_Consortium'
+
+FITS HEADER SAMPLES (NO IMAGE DATA):
+{"path": "/mnt/E_202/JWST/Zhenkai/F444W_catalog_update/cosmos_F444W_v13_catalog_v1.fits", "hdus": [{"hdu": 0, "extname": null, "naxis": 0, "shape_xy": [null, null], "header": {}}, {"hdu": 1, "extname": null, "naxis": 2, "shape_xy": [2003, 3280023], "header": {}, "rows": 3280023, "ncols": 285, "selected_columns": ["ID", "RA", "Dec", "KRON_RADIUS_LW", "KRON_RADIUS_CIRC_LW", "RADIUS_50_LW", "FLAG_RADIUS_50_LW", "FLUX_APER_032_F277W", "FLUXERR_APER_032_F277W", "MAG_APER_032_F277W", "MAGERR_APER_032_F277W", "FLAG_APER_032_F277W", "FLUX_APER_048_F277W", "FLUXERR_APER_048_F277W", "MAG_APER_048_F277W", "MAGERR_APER_048_F277W", "FLAG_APER_048_F277W", "FLUX_APER_070_F277W", "FLUXERR_APER_070_F277W", "MAG_APER_070_F277W", "MAGERR_APER_070_F277W", "FLAG_APER_070_F277W", "FLUX_APER_100_F277W", "FLUXERR_APER_100_F277W", "MAG_APER_100_F277W", "MAGERR_APER_100_F277W", "FLAG_APER_100_F277W", "FLUX_APER_140_F277W", "FLUXERR_APER_140_F277W", "MAG_APER_140_F277W", "MAGERR_APER_140_F277W", "FLAG_APER_140_F277W", "FLUX_APER_032_F444W", "FLUXERR_APER_032_F444W", "MAG_APER_032_F444W", "MAGERR_APER_032_F444W", "FLAG_APER_032_F444W", "FLUX_APER_048_F444W", "FLUXERR_APER_048_F444W", "MAG_APER_048_F444W", "MAGERR_APER_048_F444W", "FLAG_APER_048_F444W", "FLUX_APER_070_F444W", "FLUXERR_APER_070_F444W", "MAG_APER_070_F444W"]}]}
+{"path": "/mnt/E_202/JWST/Zhenkai/F444W_catalog_update/cosmos_F444W_v13_catalog_v1.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/COSMOSWeb_mastercatalog_v1.1.fits", "hdus": [{"hdu": 0, "extname": null, "naxis": 0, "shape_xy": [null, null], "header": {}}, {"hdu": 1, "extname": "PHOTOMETRY HOTCOLD AND SE++", "naxis": 2, "shape_xy": [2843, 784016], "header": {}, "rows": 784016, "ncols": 287, "selected_columns": ["id", "ra", "dec", "snr_hst-f814w", "wht_hst-f814w", "snr_f115w", "wht_f115w", "snr_f150w", "wht_f150w", "snr_f277w", "wht_f277w", "flux_auto_f277w", "flux_err_auto_f277w", "mag_auto_f277w", "flux_aper_f277w", "flux_err_aper_f277w", "mag_aper_f277w", "snr_f444w", "wht_f444w", "flux_auto_f444w", "flux_err_auto_f444w", "mag_auto_f444w", "flux_aper_f444w", "flux_err_aper_f444w", "mag_aper_f444w", "snr_f770w", "wht_f770w", "c_f444w", "fwhm", "mu_max_f277w", "mu_max_f444w", "kron_f444w_psf_corr", "radius_sersic", "radius_sersic_err", "mag_model_f277w", "mag_model_f444w", "mag_err_model_f277w", "mag_err_model_f444w", "flux_model_f277w", "flux_model_f444w", "flux_err-uncal_model_f277w", "flux_err-uncal_model_f444w", "flux_err-cal_model_f277w", "flux_err-cal_model_f444w"]}, {"hdu": 2, "extname": "LEPHARE", "naxis": 2, "shape_xy": [344, 784016], "header": {}, "rows": 784016, "ncols": 43, "selected_columns": []}]}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A10_v1.0_i2d.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A10_v1.0_sci.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A1_v1.0_i2d.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A1_v1.0_sci.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A10_v1.0_err.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A10_v1.0_wht.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A1_v1.0_err.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/COSMOS-Web/NIRCam_mosaics/mosaic_nircam_f444w_COSMOS-Web_30mas_A1_v1.0_wht.fits.gz", "skipped": "Large compressed FITS; avoid full decompression"}
+{"path": "/mnt/E_202/JWST/Zhenkai/F444W_catalog_update/psf_F444W_003.fits", "hdus": [{"hdu": 0, "extname": null, "naxis": 2, "shape_xy": [201, 201], "header": {}}]}
+{"path": "/mnt/E_202/JWST/Zhenkai/psf_F444W_003.fits", "hdus": [{"hdu": 0, "extname": null, "naxis": 2, "shape_xy": [201, 201], "header": {}}]}
