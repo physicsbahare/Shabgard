@@ -1,0 +1,33 @@
+name: Shabgard MIRI physical PSF pilot
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/miri-stpsf.yml'
+      - 'scripts/miri_stpsf_diagnostic.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  psf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-miri-covered-dithers
+          run-id: 45411830409
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: miri_results
+      - run: pip install stpsf scipy
+      - name: Physical PSF fits and null tests
+        run: python scripts/miri_stpsf_diagnostic.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-miri-stpsf
+          path: miri_results/miri_stpsf_diagnostic.csv
