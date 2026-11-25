@@ -25,7 +25,7 @@ def main():
         except Exception as e: failures.append({'server':server,'error':repr(e)});print(failures[-1],flush=True)
     if table is None: raise RuntimeError(f'COSMOS2025 public query failed: {failures}')
     table.write(out/'cosmos2025_local.ecsv',format='ascii.ecsv',overwrite=True)
-    pairs=[('_RAJ2000','_DEJ2000'),('RAJ2000','DEJ2000'),('RAdeg','DEdeg'),('ra','dec'),('RA','DEC')]
+    pairs=[('RAJ2000','DEJ2000'),('_RAJ2000','_DEJ2000'),('RAdeg','DEdeg'),('ra','dec'),('RA','DEC')]
     ra,dec=next(((r,d) for r,d in pairs if r in table.colnames and d in table.colnames),(None,None))
     if ra is None: raise ValueError(f'unknown coordinate columns: {table.colnames}')
     def angle(k):
@@ -36,7 +36,7 @@ def main():
         return u.Quantity(col).to(u.deg)
     cat=SkyCoord(angle(ra),angle(dec))
     finite=np.isfinite(cat.ra.deg)&np.isfinite(cat.dec.deg)
-    idcol=next((k for k in ['ID','id','ID_CW','ID_COSMOS','IDcosmos','IDcosmos2025'] if k in table.colnames),None)
+    idcol=next((k for k in ['Id','ID','id','ID_CW','ID_COSMOS','IDcosmos','IDcosmos2025'] if k in table.colnames),None)
     matches=[];counts=[]
     for ref in refs:
         p=SkyCoord(float(ref['ra_deg']),float(ref['dec_deg']),unit='deg')
