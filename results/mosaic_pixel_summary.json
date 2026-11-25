@@ -1,7 +1,7 @@
 {
-  "updated_utc": "2026-11-25T02:21:24.001285+00:00",
+  "updated_utc": "2026-11-25T05:25:47.176641+00:00",
   "total_products_sampled": 77,
-  "sampled_this_run": 3,
+  "sampled_this_run": 0,
   "pixel_status_counts": {
     "finite_mosaic_sci_pixels": 75,
     "no_finite_sci_pixels": 2
