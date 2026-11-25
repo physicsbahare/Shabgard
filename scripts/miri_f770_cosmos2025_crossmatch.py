@@ -62,5 +62,5 @@ def main():
         n_unique_within_0p3=sum(r['n_within_0p3']==1 for r in counts),n_within_0p5=sum(r['n_within_0p5']>0 for r in counts),
         n_ambiguous_within_0p5=sum(r['n_within_0p5']>1 for r in counts),n_within_1p0=sum(r['n_within_1p0']>0 for r in counts),
         failed_attempts=failures,stationary_galaxy_classification_validated=False,cross_epoch_registration_validated=False)
-    (out/'summary.json').write_text(json.dumps(summary,indent=2));print(json.dumps(summary,indent=2),flush=True)
+    (out/'summary.json').write_text(json.dumps(summary,indent=2,default=lambda x: x.item() if isinstance(x,np.generic) else str(x)));print(json.dumps(summary,indent=2,default=lambda x: x.item() if isinstance(x,np.generic) else str(x)),flush=True)
 if __name__=='__main__':main()
