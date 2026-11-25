@@ -3,12 +3,13 @@ import argparse, csv, glob, json
 from pathlib import Path
 import numpy as np
 from scipy.ndimage import shift, maximum_filter
-from scipy.optimize import least_squares
+from scipy.optimize import least_squares, minimize
 import stpsf
 
-def fit(a,e,good,psf,x,y,neighbors=()):
+def fit(a,e,good,psf,x,y,neighbors=(),region_center=None,return_cost=False):
     yy,xx=np.indices(a.shape)
-    region=good & (np.hypot(xx-x,yy-y)<15)
+    cx,cy=(x,y) if region_center is None else region_center
+    region=good & (np.hypot(xx-cx,yy-cy)<15)
     if region.sum()<100: raise ValueError("insufficient fit pixels")
     def template(u,v):
         out=np.zeros(a.shape)
@@ -26,7 +27,40 @@ def fit(a,e,good,psf,x,y,neighbors=()):
     b=np.linalg.lstsq(X,z,rcond=None)[0]
     res=least_squares(lambda q:X@q-z,b,loss="soft_l1",f_scale=2)
     cov=np.linalg.pinv(X.T@X)
-    return float(res.x[0]),float(np.sqrt(cov[0,0])),template(x,y)
+    result=(float(res.x[0]),float(np.sqrt(cov[0,0])),template(x,y))
+    if return_cost: return (*result,float(2*res.cost))
+    return result
+
+def localize(a,e,good,psf,x,y,neighbors,search_radius=2.5):
+    """Profile robust objective over centroid; fixed pixel mask prevents edge bias.
+    Search radius is a diagnostic assumption, not a calibrated astrometric prior.
+    """
+    cache={}
+    def objective(q):
+        dx,dy=map(float,q)
+        if np.hypot(dx,dy)>search_radius+1e-9:
+            return 1e30
+        key=(round(dx,7),round(dy,7))
+        if key not in cache:
+            cache[key]=fit(a,e,good,psf,x+dx,y+dy,neighbors,
+                           region_center=(x,y),return_cost=True)
+        return cache[key][3]
+    grid=[(dx,dy) for dx in np.linspace(-2,2,5)
+          for dy in np.linspace(-2,2,5) if np.hypot(dx,dy)<=search_radius]
+    seed=min(grid,key=objective)
+    # SLSQP with a finite-difference step large enough for the pixel spline.
+    opt=minimize(objective,seed,method="SLSQP",
+                 bounds=[(-search_radius,search_radius)]*2,
+                 constraints=[{"type":"ineq","fun":lambda q:search_radius**2-np.dot(q,q)}],
+                 options={"eps":0.002,"maxiter":35,"ftol":1e-5})
+    q=opt.x if opt.success and objective(opt.x)<=objective(seed) else np.array(seed)
+    dx,dy=map(float,q)
+    f,s,t,cost=fit(a,e,good,psf,x+dx,y+dy,neighbors,
+                   region_center=(x,y),return_cost=True)
+    forced=objective((0.,0.))
+    return dict(dx=dx,dy=dy,flux=f,sigma=s,cost=cost,
+                improvement=forced-cost,optimizer_success=bool(opt.success),
+                near_boundary=bool(np.hypot(dx,dy)>0.9*search_radius))
 
 def main():
     p=argparse.ArgumentParser();p.add_argument("--root",default="miri_results");args=p.parse_args()
@@ -41,6 +75,10 @@ def main():
         x,y=float(d["x_target"]),float(d["y_target"])
         out={"filename":r["filename"],"filter":r["filter"],"status":"error"}
         try:
+            if r.get("sci_bunit","").strip().lower().replace(" ","") not in ("mjy/sr","mjy/sr-1"):
+                raise ValueError("SCI BUNIT is not validated MJy/sr")
+            area=float(r["pixel_area_sr"])
+            if not np.isfinite(area) or area<=0: raise ValueError("Invalid PIXAR_SR")
             m=stpsf.MIRI();m.filter=r["filter"]
             m.detector_position=(int(round(float(r["x_photometry"]))),int(round(float(r["y_photometry"]))))
             hd=m.calc_psf(fov_pixels=41,oversample=4)
@@ -52,6 +90,7 @@ def main():
             neighbors=[(float(u),float(v)) for v,u in np.argwhere(peaks)]
             neighbors=sorted(neighbors,key=lambda q: -sn[int(q[1]),int(q[0])])[:8]
             f,s,t=fit(a,e,good,psf,x,y,neighbors)
+            loc=localize(a,e,good,psf,x,y,neighbors)
             null=[]; rec=[]
             for theta in np.linspace(0,2*np.pi,12,endpoint=False):
                 u,v=x+18*np.cos(theta),y+18*np.sin(theta)
@@ -62,8 +101,12 @@ def main():
                 except ValueError: pass
             if len(null)<6: raise ValueError("insufficient nulls")
             noise=1.4826*np.median(np.abs(np.array(null)-np.median(null)))
-            k=float(r["pixel_area_sr"])*1e12
-            out.update(status="physical_psf_fixed_position_DIAGNOSTIC",flux_ujy=f*k,formal_sigma_ujy=s*k,null_sigma_ujy=noise*k,n_null=len(null),null_median_ujy=float(np.median(null))*k,injection_recovery_median=float(np.median(rec)),n_neighbors=len(neighbors),psf_sum=float(psf.sum()),sigma_proxy_ujy=max(s,noise)*k)
+            k=area*1e12
+            out.update(free_dx_pix=loc["dx"],free_dy_pix=loc["dy"],free_flux_ujy=loc["flux"]*k,
+                       free_formal_sigma_ujy=loc["sigma"]*k,free_robust_cost_improvement=loc["improvement"],
+                       free_optimizer_success=loc["optimizer_success"],free_near_search_boundary=loc["near_boundary"],
+                       free_search_radius_pix=2.5,free_detection_validated=False,astrometric_epoch_validated=False,
+                       status="physical_psf_fixed_position_DIAGNOSTIC",flux_ujy=f*k,formal_sigma_ujy=s*k,null_sigma_ujy=noise*k,n_null=len(null),null_median_ujy=float(np.median(null))*k,injection_recovery_median=float(np.median(rec)),n_neighbors=len(neighbors),psf_sum=float(psf.sum()),sigma_proxy_ujy=max(s,noise)*k)
         except Exception as exc: out["error"]=repr(exc)
         results.append(out);print(json.dumps(out),flush=True)
     fields=sorted(set().union(*(r.keys() for r in results)))
