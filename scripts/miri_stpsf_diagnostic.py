@@ -2,11 +2,11 @@
 import argparse, csv, glob, json
 from pathlib import Path
 import numpy as np
-from scipy.ndimage import shift, maximum_filter
+from scipy.ndimage import shift, maximum_filter, gaussian_filter
 from scipy.optimize import least_squares, minimize
 import stpsf
 
-def fit(a,e,good,psf,x,y,neighbors=(),region_center=None,return_cost=False):
+def fit(a,e,good,psf,x,y,neighbors=(),region_center=None,return_cost=False,positive=False):
     yy,xx=np.indices(a.shape)
     cx,cy=(x,y) if region_center is None else region_center
     region=good & (np.hypot(xx-cx,yy-cy)<15)
@@ -25,7 +25,9 @@ def fit(a,e,good,psf,x,y,neighbors=(),region_center=None,return_cost=False):
     X=np.stack(cols,axis=-1)[region]/e[region,None]
     z=a[region]/e[region]
     b=np.linalg.lstsq(X,z,rcond=None)[0]
-    res=least_squares(lambda q:X@q-z,b,loss="soft_l1",f_scale=2)
+    lo=np.full(len(b),-np.inf)
+    if positive: lo[0]=0; b[0]=max(b[0],1e-12)
+    res=least_squares(lambda q:X@q-z,b,bounds=(lo,np.full(len(b),np.inf)),loss="soft_l1",f_scale=2)
     cov=np.linalg.pinv(X.T@X)
     result=(float(res.x[0]),float(np.sqrt(cov[0,0])),template(x,y))
     if return_cost: return (*result,float(2*res.cost))
@@ -43,7 +45,7 @@ def localize(a,e,good,psf,x,y,neighbors,search_radius=2.5):
         key=(round(dx,7),round(dy,7))
         if key not in cache:
             cache[key]=fit(a,e,good,psf,x+dx,y+dy,neighbors,
-                           region_center=(x,y),return_cost=True)
+                           region_center=(x,y),return_cost=True,positive=True)
         return cache[key][3]
     grid=[(dx,dy) for dx in np.linspace(-2,2,5)
           for dy in np.linspace(-2,2,5) if np.hypot(dx,dy)<=search_radius]
@@ -56,7 +58,7 @@ def localize(a,e,good,psf,x,y,neighbors,search_radius=2.5):
     q=opt.x if opt.success and objective(opt.x)<=objective(seed) else np.array(seed)
     dx,dy=map(float,q)
     f,s,t,cost=fit(a,e,good,psf,x+dx,y+dy,neighbors,
-                   region_center=(x,y),return_cost=True)
+                   region_center=(x,y),return_cost=True,positive=True)
     forced=objective((0.,0.))
     return dict(dx=dx,dy=dy,flux=f,sigma=s,cost=cost,
                 improvement=forced-cost,optimizer_success=bool(opt.success),
@@ -91,17 +93,31 @@ def main():
             neighbors=sorted(neighbors,key=lambda q: -sn[int(q[1]),int(q[0])])[:8]
             f,s,t=fit(a,e,good,psf,x,y,neighbors)
             loc=localize(a,e,good,psf,x,y,neighbors)
-            null=[]; rec=[]
+            null=[]; rec=[]; free_null=[]; mismatch_rec=[]; mismatch_pos=[]
+            broad=gaussian_filter(psf,0.45); broad*=psf.sum()/broad.sum()
             for theta in np.linspace(0,2*np.pi,12,endpoint=False):
                 u,v=x+18*np.cos(theta),y+18*np.sin(theta)
                 try:
                     n,ns,nt=fit(a,e,good,psf,u,v,neighbors)
                     inj,_,_=fit(a+max(abs(f),5*s)*nt,e,good,psf,u,v,neighbors)
                     null.append(n);rec.append((inj-n)/max(abs(f),5*s))
+                    # Same centroid search for target and controls; exclude templates coincident with trial source.
+                    nn=[q for q in neighbors if np.hypot(q[0]-u,q[1]-v)>4]
+                    nn.append((x+loc['dx'],y+loc['dy']))
+                    z=localize(a,e,good,psf,u,v,nn)
+                    free_null.append(z['flux'])
+                    amp=max(loc['flux'],5*loc['sigma'])
+                    _,_,template=fit(a,e,good,broad,u+0.37,v-0.29,nn)
+                    zz=localize(a+amp*template,e,good,psf,u,v,nn)
+                    mismatch_rec.append((zz['flux']-z['flux'])/amp)
+                    mismatch_pos.append(np.hypot(zz['dx']-0.37,zz['dy']+0.29))
                 except ValueError: pass
             if len(null)<6: raise ValueError("insufficient nulls")
             noise=1.4826*np.median(np.abs(np.array(null)-np.median(null)))
             k=area*1e12
+            fn=np.asarray(free_null)
+            if len(fn)<6: raise ValueError('insufficient matched-search controls')
+            out.update(matched_null_n=len(fn),matched_null_ge_target=int(np.sum(fn>=loc['flux'])),matched_null_max_ujy=float(fn.max()*k),matched_null_median_ujy=float(np.median(fn)*k),mismatch_injection_n=len(mismatch_rec),mismatch_recovery_median=float(np.median(mismatch_rec)),mismatch_centroid_error_median_pix=float(np.median(mismatch_pos)),mismatch_blur_sigma_pix=0.45)
             out.update(free_dx_pix=loc["dx"],free_dy_pix=loc["dy"],free_flux_ujy=loc["flux"]*k,
                        free_formal_sigma_ujy=loc["sigma"]*k,free_robust_cost_improvement=loc["improvement"],
                        free_optimizer_success=loc["optimizer_success"],free_near_search_boundary=loc["near_boundary"],
