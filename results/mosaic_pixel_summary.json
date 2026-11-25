@@ -1,9 +1,9 @@
 {
-  "updated_utc": "2026-11-25T02:15:50.503761+00:00",
-  "total_products_sampled": 74,
+  "updated_utc": "2026-11-25T02:21:24.001285+00:00",
+  "total_products_sampled": 77,
   "sampled_this_run": 3,
   "pixel_status_counts": {
-    "finite_mosaic_sci_pixels": 72,
+    "finite_mosaic_sci_pixels": 75,
     "no_finite_sci_pixels": 2
   },
   "note": "Finite SCI mosaic pixels do not prove detector exposure coverage or a target detection; WHT/DQ checks where available. No SNR/centroid claim."
