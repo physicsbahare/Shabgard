@@ -1,0 +1,70 @@
+name: Shabgard PRIMER 2022 F770W independent epoch
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/primer2022-f770-astrometry.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  primer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-fifth-epoch-primer2022
+          run-id: 45815669496
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: primer
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-f770-field-controls
+          run-id: 45582311047
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: field2024
+      - run: pip install 'jwst>=1.17,<3' 'astroquery>=0.4.11,<1' stpsf scipy matplotlib requests
+      - name: Fit target physical PSF in four newly recovered 2022 exposures
+        run: |
+          cp primer/pixel_audit.csv primer/miri_cal_detector_diagnostic.csv
+          python -u scripts/miri_stpsf_diagnostic.py --root primer
+      - name: Retrieve exact 2022 CAL and measure actual field sources
+        run: |
+          mkdir -p cal
+          for seq in 02101 04101; do
+            for n in 00001 00002; do
+              f="jw01837004006_${seq}_${n}_mirimage_cal.fits"
+              curl --fail --location --retry 2 --max-time 240 "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:JWST/product/${f}" -o "cal/${f}"
+            done
+          done
+          python -u scripts/miri_f770_field_controls.py 'cal/*_cal.fits' --out field2022
+      - name: Same-filter cross-visit network using 2022 and 2024 field measurements
+        run: |
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+          rows=[]
+          for d in ('field2022','field2024'):
+              p=list(Path(d).rglob('field_candidates.csv'))
+              assert len(p)==1,p
+              rows+=list(csv.DictReader(p[0].open()))
+          with open('combined_field.csv','w',newline='') as f:
+              w=csv.DictWriter(f,fieldnames=sorted(set().union(*(r.keys() for r in rows))))
+              w.writeheader();w.writerows(rows)
+          PY
+          python -u scripts/miri_f770_network_registration.py combined_field.csv crossvisit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-primer2022-f770-science
+          path: |
+            primer/miri_stpsf_diagnostic.csv
+            field2022/
+            combined_field.csv
+            crossvisit/
+          if-no-files-found: warn
