@@ -1,0 +1,31 @@
+name: Shabgard Gaia reference audit
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hst-reference-gaia.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-nircam-same-filter
+          run-id: 45795708087
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: baseline
+      - run: pip install astropy astroquery numpy scipy requests
+      - run: python -u scripts/hst_reference_gaia_audit.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gaia-reference-audit
+          path: gaia_reference_results/
