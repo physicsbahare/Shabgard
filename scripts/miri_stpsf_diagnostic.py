@@ -65,10 +65,10 @@ def localize(a,e,good,psf,x,y,neighbors,search_radius=2.5):
                 near_boundary=bool(np.hypot(dx,dy)>0.9*search_radius))
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument("--root",default="miri_results");args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument("--root",default="miri_results");p.add_argument("--extended-controls",action="store_true");args=p.parse_args()
     root=Path(args.root)
     rows=list(csv.DictReader((root/"miri_cal_detector_diagnostic.csv").open()))
-    results=[]
+    results=[]; trials=[]
     for r in rows:
         path=root/"cutouts"/(r["filename"].replace(".fits","_local.npz"))
         if not path.exists(): continue
@@ -95,6 +95,11 @@ def main():
             loc=localize(a,e,good,psf,x,y,neighbors)
             null=[]; rec=[]; free_null=[]; mismatch_rec=[]; mismatch_pos=[]
             broad=gaussian_filter(psf,0.45); broad*=psf.sum()/broad.sum()
+            k=area*1e12
+            # Inject multiple subpixel phases and mismatch widths; preserve PSF integral.
+            widths=(0.,0.25,0.45,0.65) if args.extended_controls else (0.45,)
+            models={w: gaussian_filter(psf,w) if w>0 else psf.copy() for w in widths}
+            for w in widths: models[w]*=psf.sum()/models[w].sum()
             for theta in np.linspace(0,2*np.pi,12,endpoint=False):
                 u,v=x+18*np.cos(theta),y+18*np.sin(theta)
                 try:
@@ -111,6 +116,24 @@ def main():
                     zz=localize(a+amp*template,e,good,psf,u,v,nn)
                     mismatch_rec.append((zz['flux']-z['flux'])/amp)
                     mismatch_pos.append(np.hypot(zz['dx']-0.37,zz['dy']+0.29))
+                    if args.extended_controls:
+                        # Fit both null and injections using the identical localize routine.
+                        # The same physical blank is reused across widths: not independent trials.
+                        phase_x=0.45*np.cos(2*theta+0.3);phase_y=0.45*np.sin(2*theta+0.3)
+                        for w in widths:
+                            try:
+                                _,_,tmpl=fit(a,e,good,models[w],u+phase_x,v+phase_y,nn)
+                                z2=localize(a+amp*tmpl,e,good,psf,u,v,nn)
+                                trials.append(dict(filename=r['filename'],filter=r['filter'],theta_rad=float(theta),
+                                    blur_sigma_pix=w,phase_x_pix=float(phase_x),phase_y_pix=float(phase_y),
+                                    injected_ujy=amp*k,null_free_ujy=z['flux']*k,null_formal_ujy=z['sigma']*k,
+                                    null_dx_pix=z['dx'],null_dy_pix=z['dy'],null_optimizer_success=z['optimizer_success'],
+                                    null_near_boundary=z['near_boundary'],injected_fit_ujy=z2['flux']*k,
+                                    recovery_fraction=(z2['flux']-z['flux'])/amp,
+                                    centroid_dx_error_pix=z2['dx']-phase_x,centroid_dy_error_pix=z2['dy']-phase_y,
+                                    injected_optimizer_success=z2['optimizer_success'],injected_near_boundary=z2['near_boundary'],
+                                    target_free_ujy=loc['flux']*k))
+                            except ValueError: pass
                 except ValueError: pass
             if len(null)<6: raise ValueError("insufficient nulls")
             noise=1.4826*np.median(np.abs(np.array(null)-np.median(null)))
@@ -128,5 +151,10 @@ def main():
     fields=sorted(set().union(*(r.keys() for r in results)))
     with (root/"miri_stpsf_diagnostic.csv").open("w") as f:
         w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(results)
+    if args.extended_controls:
+        if not trials: raise RuntimeError("No extended injection trials saved")
+        with (root/"miri_extended_controls.csv").open("w",newline="") as f:
+            w=csv.DictWriter(f,fieldnames=list(trials[0]));w.writeheader();w.writerows(trials)
+        print(json.dumps({"extended_trials":len(trials),"independent_trial_count_not_asserted":True}),flush=True)
     if not any(r["status"]!="error" for r in results): raise RuntimeError("No successful STPSF fits")
 if __name__=="__main__":main()
