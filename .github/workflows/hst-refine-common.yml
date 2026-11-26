@@ -1,0 +1,32 @@
+name: Shabgard HST fine-grid common references
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hst-refine-common.yml'
+      - 'scripts/hst_refine_common.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-hst-wfc3-ir-pilot
+          run-id: 45858906823
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: pilot
+      - run: pip install 'astropy>=6,<8' 'astroquery>=0.4.11,<1' numpy scipy requests
+      - run: python -u scripts/hst_refine_common.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-hst-refined-common
+          path: hst_refined/
