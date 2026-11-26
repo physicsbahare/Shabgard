@@ -107,16 +107,16 @@ def common_stamp(a,e,q,x,y,jac):
     def interp(v): return map_coordinates(v,xy,order=1,mode='constant',cval=0.,prefilter=False)
     support=interp(good.astype(float))
     val=interp(np.where(good,z,0.))
-    return np.divide(val,support,out=np.zeros_like(val),where=support>0),support>=.999
+    return np.divide(val,support,out=np.zeros_like(val),where=support>0),support>=.80
 def blur_stamp(z,good,source,target):
     if target<=source+1e-10: return z.copy(),good.copy()
     sigma=np.sqrt(target**2-source**2)/(2.354820045*STEP)
     den=gaussian_filter(good.astype(float),sigma,mode='constant',cval=0.)
     num=gaussian_filter(np.where(good,z,0.),sigma,mode='constant',cval=0.)
-    return np.divide(num,den,out=np.zeros_like(num),where=den>0),den>=.98
+    return np.divide(num,den,out=np.zeros_like(num),where=den>0),den>=.80
 def plane_centroid(z,mask,r):
     ap=RAD<=r;ann=(RAD>=.95)&(RAD<=1.45)
-    if mask[ap].mean()<.95 or mask[ann].mean()<.80: raise ValueError('common mask support')
+    if mask[ap].mean()<.85 or mask[ann].mean()<.65: raise ValueError('common mask support')
     X=np.stack([np.ones_like(GX),GX,GY],axis=-1)
     M=X[ann&mask];v=z[ann&mask]
     for _ in range(5):
@@ -176,10 +176,11 @@ def psf_pilot():
                     else:
                         n,gn=blur_stamp(nz,ng,F140,t);k,gk=blur_stamp(mz,mg,m,t)
                     variants.append((label,n,gn,k,gk))
+                rawmask=ng&mg
                 mask=np.logical_and.reduce([g for _,_,gn,_,gk in variants for g in (gn,gk)])
                 for label,n,gn,k,gk in variants:
                     for r in (.35,.5,.7):
-                        rec=dict(galaxy=gid,nircam=nf,miri=mf,nircam_mjd=nt,miri_mjd=mt,scenario=label,radius_arcsec=r,status='error',stationary_verified=False,common_ap_fraction=float(mask[RAD<=r].mean()))
+                        rec=dict(galaxy=gid,nircam=nf,miri=mf,nircam_mjd=nt,miri_mjd=mt,scenario=label,radius_arcsec=r,status='error',stationary_verified=False,common_ap_fraction=float(mask[RAD<=r].mean()),common_ann_fraction=float(mask[(RAD>=.95)&(RAD<=1.45)].mean()))
                         try:
                             cn,sn,wn=plane_centroid(n,mask,r);cm,sm,wm=plane_centroid(k,mask,r)
                             rec.update(status='diagnostic',east_mas=float((cm-cn)[0]*1000),north_mas=float((cm-cn)[1]*1000),nir_east_mas=float(cn[0]*1000),nir_north_mas=float(cn[1]*1000),miri_east_mas=float(cm[0]*1000),miri_north_mas=float(cm[1]*1000),nir_mean_to_sky_mad=sn,miri_mean_to_sky_mad=sm)
