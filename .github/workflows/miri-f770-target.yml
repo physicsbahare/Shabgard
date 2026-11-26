@@ -35,7 +35,7 @@ jobs:
           run-id: 45626983126
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: network
-      - run: python -m pip install 'jwst>=1.17,<3' scipy matplotlib requests
+      - run: python -m pip install 'jwst>=1.17,<3' scipy matplotlib requests 'astroquery>=0.4.11,<1'
       - name: Download original F770W CAL files
         run: |
           python scripts/select_miri_cal_pilot.py --results results --out miri_results --max-per-observation 8 --filters F770W --obsids 200464999 --pointings jw01727016001
