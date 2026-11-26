@@ -1,0 +1,44 @@
+name: Shabgard MIRI NIRCam image-based galaxy controls
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/miri-nircam-galaxies.yml'
+      - 'scripts/miri_nircam_galaxy_centroids.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  galaxy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-f770-counterparts
+          run-id: 45633668155
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: refs
+      - run: python -m pip install 'jwst>=1.17,<3' 'astroquery>=0.4.11,<1' scipy matplotlib requests
+      - name: Retrieve exact original CAL exposures
+        run: |
+          python scripts/select_miri_cal_pilot.py --results results --out miri_results --max-per-observation 8 --filters F770W --obsids 200464999 --pointings jw01727016001
+          python scripts/download_miri_cal_batch.py --selection miri_results/miri_cal_selection.csv --out cal --report miri_results/miri_download_manifest.csv --max-files 8
+          for n in 00001 00002 00003; do
+            f="jw07814003013_02201_${n}_nrca1_cal.fits"
+            curl --fail --location --retry 2 --max-time 240 "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:JWST/product/${f}" -o "cal/${f}"
+          done
+      - name: Measure galaxy centroids and image diagnostics
+        run: python scripts/miri_nircam_galaxy_centroids.py --refs refs/counterpart_candidates.csv --cal cal --out galaxy_results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-miri-nircam-galaxies
+          path: |
+            galaxy_results/
+            miri_results/miri_download_manifest.csv
+          if-no-files-found: warn
