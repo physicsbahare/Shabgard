@@ -1,0 +1,34 @@
+name: Shabgard HST WFC3 IR independent epochs
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hst-wfc3-ir-epoch.yml'
+      - 'scripts/hst_wfc3_ir_epoch.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  hst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-nircam-same-filter
+          run-id: 45795708087
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: baseline
+      - run: pip install 'astropy>=6,<8' 'astroquery>=0.4.11,<1' numpy scipy requests
+      - name: Recover HST calibrated exposures and test moving-source likelihood
+        run: python -u scripts/hst_wfc3_ir_epoch.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-hst-wfc3-ir-pilot
+          path: hst_results/
+          if-no-files-found: warn
