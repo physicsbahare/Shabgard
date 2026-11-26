@@ -25,9 +25,11 @@ jobs:
           path: miri_results
       - run: pip install stpsf scipy
       - name: Physical PSF fits and null tests
-        run: python scripts/miri_stpsf_diagnostic.py
+        run: python scripts/miri_stpsf_diagnostic.py --extended-controls
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: shabgard-miri-stpsf
-          path: miri_results/miri_stpsf_diagnostic.csv
+          path: |
+            miri_results/miri_stpsf_diagnostic.csv
+            miri_results/miri_extended_controls.csv
