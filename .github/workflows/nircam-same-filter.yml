@@ -1,0 +1,27 @@
+name: Shabgard NIRCam same-filter astrometry
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/nircam_same_filter_astrometry.py'
+      - '.github/workflows/nircam-same-filter.yml'
+permissions:
+  contents: read
+jobs:
+  astrometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'jwst>=1.17,<3' 'astroquery>=0.4.11,<1' scipy matplotlib requests fsspec aiohttp
+      - name: Measure same-filter CAL target and local reference centroids
+        run: python -u scripts/nircam_same_filter_astrometry.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-nircam-same-filter
+          path: nircam_results/
+          if-no-files-found: warn
