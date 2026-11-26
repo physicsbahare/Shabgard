@@ -1,0 +1,62 @@
+name: Shabgard independent fifth epoch pilots
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/independent-fifth-epoch.yml'
+      - 'scripts/miri_fifth_epoch.py'
+      - 'scripts/miri_primer_2022_epoch.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  december2025:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-nircam-same-filter
+          run-id: 45795708087
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: baseline
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-miri-covered-dithers
+          run-id: 45411830409
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: diagnostic
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-miri-stpsf
+          run-id: 45748539048
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: psf
+      - run: python -m pip install 'jwst>=1.17,<3' 'astroquery>=0.4.11,<1' scipy matplotlib requests fsspec aiohttp
+      - run: python -u scripts/miri_fifth_epoch.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-fifth-epoch-december2025
+          path: fifth_epoch/
+          if-no-files-found: warn
+  december2022:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'jwst>=1.17,<3' 'astroquery>=0.4.11,<1' scipy matplotlib requests fsspec aiohttp
+      - run: python -u scripts/miri_primer_2022_epoch.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-fifth-epoch-primer2022
+          path: primer2022/
+          if-no-files-found: warn
