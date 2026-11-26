@@ -200,7 +200,7 @@ def main():
                 s=combined(b)
                 if np.isfinite(s).any():controls.append(float(np.nanmax(s)))
         date,filt,reg=key
-        r=dict(visit=date,filter=filt,registered=reg,n_exposures=len(g),peak_snr=float(sn[i]),dx_arcsec=grid[i,0],dy_arcsec=grid[i,1],boundary=bool(np.max(abs(grid[i]))>.56),n_control_regions=len(controls),control_max_snr=controls,controls_ge_peak=sum(x>=sn[i] for x in controls),stationary_verified=False,source_association_validated=False)
+        r=dict(visit=date,filter=filt,registered=reg,n_exposures=len(g),peak_snr=float(sn[i]),dx_arcsec=grid[i,0],dy_arcsec=grid[i,1],boundary=bool(np.max(abs(grid[i]))>.56),n_control_regions=len(controls),control_max_snr=controls,controls_ge_peak=int(sum(bool(x>=sn[i]) for x in controls)),stationary_verified=False,source_association_validated=False)
         summary.append(r);print('HST_VISIT',json.dumps(r),flush=True)
         np.savez_compressed(OUT/f'{date}_{filt}_{reg}_likelihood.npz',grid=grid,snr=sn,controls=controls)
     (OUT/'summary.json').write_text(json.dumps(summary,indent=2))
