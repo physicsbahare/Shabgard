@@ -64,21 +64,21 @@ def fit_one(a,e,d,w,ra,dec):
     q=fit(a,e,d,x,y);return q,coord(w,q),x,y
 def refs_from_anchor(a,e,d,w,tx,ty):
     # Sources in a bounded local field, not a catalog of verified stationary objects.
-    h=650; ix,iy=round(tx),round(ty);x0=max(9,ix-h);x1=min(a.shape[1]-9,ix+h);y0=max(9,iy-h);y1=min(a.shape[0]-9,iy+h)
+    h=1100; ix,iy=round(tx),round(ty);x0=max(9,ix-h);x1=min(a.shape[1]-9,ix+h);y0=max(9,iy-h);y1=min(a.shape[0]-9,iy+h)
     z=np.asarray(a[y0:y1,x0:x1],float);valid=np.isfinite(z)&((d[y0:y1,x0:x1]&3)==0)
     bg=np.median(z[valid]);noise=max(1e-12,1.4826*np.median(abs(z[valid]-bg)))
     zz=gaussian_filter(np.where(valid,z-bg,0.),.8)
-    yy,xx=np.nonzero((zz==maximum_filter(zz,size=9))&(zz>8*noise)&valid)
+    yy,xx=np.nonzero((zz==maximum_filter(zz,size=9))&(zz>4*noise)&valid)
     order=np.argsort(zz[yy,xx])[::-1];refs=[]
-    for i in order[:300]:
+    for i in order[:1600]:
         x,y=float(xx[i]+x0),float(yy[i]+y0)
         if np.hypot(x-tx,y-ty)<25 or any(np.hypot(x-q['x'],y-q['y'])<25 for q in refs):continue
         try:
             q=fit(a,e,d,x,y)
-            if not usable(q,100):continue
+            if not usable(q,50):continue
             pos=coord(w,q);refs.append(dict(id=len(refs),ra=pos.ra.deg,dec=pos.dec.deg,x=q['x'],y=q['y']))
         except Exception:continue
-        if len(refs)>=70:break
+        if len(refs)>=250:break
     return refs
 def main():
     manifest=[]; files=[]; targets=[]; reference_rows=[];refs=[]
@@ -134,19 +134,34 @@ def main():
                 ra,dec=sky_at(t,60308)
                 q,pos,x,y=fit_one(a,e,d,w,ra,dec)
                 row.update(q);row.update(ra_deg=pos.ra.deg,dec_deg=pos.dec.deg,status='candidate' if usable(q) else 'low_quality',pred_x=x,pred_y=y)
-                if usable(q) and not refs:
-                    refs=refs_from_anchor(a,e,d,w,x,y);dump('anchor_refs.csv',refs)
+                if usable(q):
+                    fresh=refs_from_anchor(a,e,d,w,x,y)
+                    for v in fresh:
+                        if any(np.hypot((v['ra']-k['ra'])*3600*np.cos(np.deg2rad(DEC)),(v['dec']-k['dec'])*3600)<.20 for k in refs):continue
+                        v['id']=len(refs);v['anchor_filename']=fn.name;refs.append(v)
+                    dump('anchor_refs.csv',refs)
                     print('ANCHOR',fn.name,len(refs),flush=True)
-                for ref in refs:
-                    try:
-                        z,ps,_,_=fit_one(a,e,d,w,ref['ra'],ref['dec'])
-                        if not usable(z,50):continue
-                        dx,dy=offset(SkyCoord(ref['ra'],ref['dec'],unit='deg'),ps)
-                        reference_rows.append(dict(program=program,filename=fn.name,ref_id=ref['id'],east_mas=dx,north_mas=dy,**z))
-                    except Exception:continue
         except Exception as exc:row['error']=repr(exc)
         targets.append(row);dump('target_centroids.csv',targets);dump('reference_centroids.csv',reference_rows)
         print('TARGET',json.dumps(row),flush=True)
+    # Refit every union reference on every exposure; avoid chronological selection.
+    for program,fn in files:
+        with fits.open(fn,memmap=False) as h,datamodels.open(fn) as m:
+            a,e,d=h['SCI'].data,h['ERR'].data,h['DQ'].data;w=m.meta.wcs
+            for ref in refs:
+                try:
+                    z,ps,_,_=fit_one(a,e,d,w,ref['ra'],ref['dec'])
+                    if not usable(z,50):continue
+                    dx,dy=offset(SkyCoord(ref['ra'],ref['dec'],unit='deg'),ps)
+                    reference_rows.append(dict(program=program,filename=fn.name,ref_id=ref['id'],east_mas=dx,north_mas=dy,**z))
+                except Exception:continue
+        dump('reference_centroids.csv',reference_rows)
+    # Retain only references seen in every program for a common-frame diagnostic.
+    coverage={}
+    for z in reference_rows:coverage.setdefault(z['ref_id'],set()).add(z['program'])
+    common={k for k,v in coverage.items() if len(v)==3}
+    print('COMMON_REFS',len(common),flush=True)
+    reference_rows=[z for z in reference_rows if z['ref_id'] in common]
     summary=[]
     for row in targets:
         if row['status']!='candidate':continue
