@@ -5,14 +5,25 @@ from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
 from astroquery.gaia import Gaia
+from astroquery.utils.tap.core import TapPlus
+import requests, io
+from astropy.table import Table
 import hst_wfc3_ir_epoch as h
 out=Path("gaia_reference_results");out.mkdir(exist_ok=True)
 refs=h.refs()
 rows=[]
 for k,p in refs.items():
-    query=f"""SELECT source_id,ra,dec,parallax,parallax_error,pmra,pmdec,pmra_error,pmdec_error,ruwe,phot_g_mean_mag FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{p.ra.deg},{p.dec.deg},0.001))"""
+    query=f"""SELECT source_id,ra,dec,parallax,parallax_error,pmra,pmdec,pmra_error,pmdec_error,ruwe,phot_g_mean_mag FROM gaiadr3.gaia_source WHERE CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{p.ra.deg},{p.dec.deg},0.001))=1"""
     try:
-        tab=Gaia.launch_job(query).get_results()
+        # Use the TAP sync endpoint with explicit ADQL and CSV; avoid job parser response ambiguity.
+        response=requests.post('https://gea.esac.esa.int/tap-server/tap/sync',data={'REQUEST':'doQuery','LANG':'ADQL','FORMAT':'csv','QUERY':query},timeout=90)
+        response.raise_for_status()
+        if not response.text.lstrip().lower().startswith('source_id'):
+            # Independent Gaia mirror with the same DR3 table.
+            response=requests.post('https://gaia.ari.uni-heidelberg.de/tap/sync',data={'REQUEST':'doQuery','LANG':'ADQL','FORMAT':'csv','QUERY':query},timeout=90)
+            response.raise_for_status()
+        if not response.text.lstrip().lower().startswith('source_id'):raise ValueError(response.text[:400])
+        tab=Table.read(response.text,format='ascii.csv')
         matches=[]
         for t in tab:
             c=SkyCoord(t['ra']*u.deg,t['dec']*u.deg)
