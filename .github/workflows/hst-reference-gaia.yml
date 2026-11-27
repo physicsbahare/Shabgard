@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/hst-reference-gaia.yml'
+      - 'scripts/hst_reference_gaia_audit.py'
 permissions:
   contents: read
   actions: read
