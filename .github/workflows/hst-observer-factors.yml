@@ -1,0 +1,52 @@
+name: Shabgard HST observer factors and joint GLS
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hst-observer-factors.yml'
+      - 'scripts/hst_observer_factors.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  fit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-hst-refined-common
+          run-id: 45889779978
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: inputs/hst
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-nircam-fourth-epoch
+          run-id: 45808293268
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: inputs/fourth
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-nircam-same-filter
+          run-id: 45795708087
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: inputs/baseline
+      - run: |
+          mkdir -p joint
+          (cd inputs/hst && zip -qr ../../joint/hst_refined_fit.zip .)
+          (cd inputs/fourth && zip -qr ../../joint/nircam_fourth_fit.zip .)
+          (cd inputs/baseline && zip -qr ../../joint/nircam_baseline_fit.zip .)
+          pip install numpy pandas astropy astroquery
+      - run: python -u scripts/hst_observer_factors.py joint
+      - run: python -u scripts/shabgard_joint_pilot.py joint
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shabgard-joint-exact-factors
+          path: |
+            joint/hst_factors.csv
+            joint/joint_pilot_result.json
