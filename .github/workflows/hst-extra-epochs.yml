@@ -1,0 +1,60 @@
+name: Shabgard HST additional epochs
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hst-extra-epochs.yml'
+      - 'scripts/hst2010_bridge.py'
+      - 'scripts/hst2021_direct_search.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-nircam-same-filter
+          run-id: 45795708087
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: baseline
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-hst-wfc3-ir-pilot
+          run-id: 45858906823
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: pilot
+      - run: pip install astropy astroquery numpy scipy requests
+      - run: python -u scripts/hst2010_bridge.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hst2010-bridge
+          path: hst2010_bridge/
+  search2021:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-nircam-same-filter
+          run-id: 45795708087
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: baseline
+      - run: pip install astropy astroquery numpy scipy requests
+      - run: python -u scripts/hst2021_direct_search.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hst2021-direct-search
+          path: hst2021_search/
