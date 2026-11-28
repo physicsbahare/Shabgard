@@ -183,6 +183,7 @@ def main():
                     ff,vv=scan(a,e,d,w,center,grid,sigma);sn=combined([(ff,vv)])
                     i=np.nanargmax(sn);row.update(status='pixel_likelihood',max_snr=float(sn[i]),dx_arcsec=grid[i,0],dy_arcsec=grid[i,1],flux_native=float(ff[i]),flux_sigma_native=float(np.sqrt(vv[i])),boundary=bool(np.max(abs(grid[i]))>.56))
                     key=(date,filt,bool(row['registered']))
+                    np.savez_compressed(OUT/f'{name}_likelihood.npz',grid=grid,flux=ff,variance=vv)
                     groups[key].append((ff,vv))
                     for j,(bx,by) in enumerate(blank_offsets):
                         try:
@@ -191,7 +192,7 @@ def main():
                         except Exception:continue
             except Exception as ex:row['error']=repr(ex)
             finally:
-                audit.append(row);write('exposure_audit.csv',audit);write('references.csv',refrows);print('HST_FLT',json.dumps(row),flush=True)
+                audit.append(row);write('exposure_audit.csv',audit);write('references.csv',refrows);print('HST_FLT',json.dumps(row,default=lambda x:x.item() if isinstance(x,np.generic) else x.tolist()),flush=True)
     summary=[]
     for key,g in groups.items():
         sn=combined(g);i=np.nanargmax(sn);controls=[]
@@ -201,8 +202,8 @@ def main():
                 if np.isfinite(s).any():controls.append(float(np.nanmax(s)))
         date,filt,reg=key
         r=dict(visit=date,filter=filt,registered=reg,n_exposures=len(g),peak_snr=float(sn[i]),dx_arcsec=grid[i,0],dy_arcsec=grid[i,1],boundary=bool(np.max(abs(grid[i]))>.56),n_control_regions=len(controls),control_max_snr=controls,controls_ge_peak=int(sum(bool(x>=sn[i]) for x in controls)),stationary_verified=False,source_association_validated=False)
-        summary.append(r);print('HST_VISIT',json.dumps(r),flush=True)
+        summary.append(r);print('HST_VISIT',json.dumps(r,default=lambda x:x.item() if isinstance(x,np.generic) else x.tolist()),flush=True)
         np.savez_compressed(OUT/f'{date}_{filt}_{reg}_likelihood.npz',grid=grid,snr=sn,controls=controls)
-    (OUT/'summary.json').write_text(json.dumps(summary,indent=2))
+    (OUT/'summary.json').write_text(json.dumps(summary,indent=2,default=lambda x:x.item() if isinstance(x,np.generic) else x.tolist()))
     if not summary:raise RuntimeError('No HST individual detector likelihood computed; inspect audit')
 if __name__=='__main__':main()
