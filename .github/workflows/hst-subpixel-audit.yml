@@ -1,0 +1,58 @@
+name: HST subpixel likelihood audit
+on:
+  push:
+    paths:
+      - '.github/workflows/hst-subpixel-audit.yml'
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-hst-wfc3-ir-pilot
+          run-id: 46090458024
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: input
+      - run: pip install numpy scipy
+      - run: |
+          python - <<'PY'
+          import csv,json
+          from pathlib import Path
+          import numpy as np
+          from scipy.optimize import minimize
+          p=Path('input')
+          out=Path('subpixel');out.mkdir(exist_ok=True)
+          rows=[]
+          for f in sorted(p.rglob('*likelihood.npz')):
+              with np.load(f) as d:
+                  g=d['grid']*1000
+                  if 'snr' in d: s=d['snr']
+                  else: s=d['flux']/np.sqrt(d['variance'])
+              i=np.nanargmax(s); c=g[i]; q=g-c
+              m=(np.max(abs(q),axis=1)<=81)&np.isfinite(s)
+              # Local quadratic in signed matched-filter log likelihood, positive peak only.
+              x,y=q[m].T/40
+              A=np.column_stack([np.ones(len(x)),x,y,x*x,x*y,y*y])
+              z=.5*np.maximum(s[m],0)**2
+              b=np.linalg.lstsq(A,z,rcond=None)[0]
+              H=-np.array([[2*b[3],b[4]],[b[4],2*b[5]]])
+              valid=np.linalg.matrix_rank(A)==6 and np.min(np.linalg.eigvalsh(H))>0
+              delta=np.linalg.solve(H,b[1:3])*40 if valid else np.array([np.nan,np.nan])
+              valid=bool(valid and np.max(abs(delta))<=40)
+              cov=np.linalg.inv(H)*1600 if valid else np.full((2,2),np.nan)
+              rows.append(dict(file=f.name,peak_snr=float(s[i]),grid_east=float(c[0]),grid_north=float(c[1]),valid=valid,east=float(c[0]+delta[0]),north=float(c[1]+delta[1]),sigma_east=float(np.sqrt(cov[0,0])),sigma_north=float(np.sqrt(cov[1,1])),cov_en=float(cov[0,1]),quadratic_rms=float(np.sqrt(np.mean((A@b-z)**2)))))
+          with (out/'subpixel.csv').open('w') as f:
+              w=csv.DictWriter(f,fieldnames=rows[0].keys());w.writeheader();w.writerows(rows)
+          for r in rows: print('SUBPIXEL',json.dumps(r))
+          print('Conditional Gaussian-template curvature only; no injection calibration or absolute registration validation.')
+          
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hst-subpixel-audit
+          path: subpixel/
