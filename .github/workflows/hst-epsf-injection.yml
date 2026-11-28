@@ -1,0 +1,52 @@
+name: HST empirical PSF injection recovery
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hst-epsf-injection.yml'
+      - 'scripts/hst_epsf_injection.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  hst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shabgard-nircam-same-filter
+          run-id: 45795708087
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: baseline
+      - run: pip install 'astropy>=6,<8' 'astroquery>=0.4.11,<1' numpy scipy requests 'photutils>=2.0,<3' beautifulsoup4
+      - name: Download official empirical PSF libraries
+        run: |
+          python - <<'PY'
+          import requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin
+          from astropy.io import fits
+          url='https://www.stsci.edu/hst/instrumentation/wfc3/data-analysis/psf'
+          r=requests.get(url,timeout=60); r.raise_for_status()
+          soup=BeautifulSoup(r.text,'html.parser')
+          for f in ['F125W','F140W','F160W']:
+              key='PSFSTD_WFC3IR_'+f
+              links=[urljoin(url,a['href']) for a in soup.select('a[href]') if key.lower() in (a.get_text()+a['href']).lower()]
+              if not links: raise RuntimeError('Missing official PSF link '+key)
+              rr=requests.get(links[0],timeout=120);rr.raise_for_status()
+              p='psf_'+f+'.fits';open(p,'wb').write(rr.content)
+              with fits.open(p) as h: print(f,links[0],h[0].data.shape)
+          PY
+      - name: Recover HST calibrated exposures and test moving-source likelihood
+        run: python -u scripts/hst_epsf_injection.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hst-epsf-injection
+          path: hst_results/
+          if-no-files-found: warn
