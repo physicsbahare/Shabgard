@@ -1,0 +1,36 @@
+name: HST ePSF common reference covariance
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hst-epsf-reference.yml'
+      - 'scripts/hst_epsf_reference_jackknife.py'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: hst-epsf-injection
+          run-id: 46121176137
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: hst
+      - uses: actions/download-artifact@v4
+        with:
+          name: hst-subpixel-audit
+          run-id: 46103301360
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: subpixel
+      - run: pip install numpy pandas
+      - run: python -u scripts/hst_epsf_reference_jackknife.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hst-epsf-reference-covariance
+          path: result/
