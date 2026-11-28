@@ -151,6 +151,15 @@ def injection_audit(a,e,d,w,center,sigma,amp,filt,name):
     from astropy.nddata import NDData
     from scipy.optimize import least_squares
     psf=GriddedPSFModel.read('psf_'+filt+'.fits',format='stdpsf')
+    x,y=pixel(w,center)
+    z,err,g,xx,yy,bg=patch(a,e,d,x,y,8)
+    def resid(p):
+        f,dx,dy,b,gx,gy=p
+        psf.x_0=x+dx;psf.y_0=y+dy;psf.flux=f
+        return ((psf(xx,yy)+b+gx*(xx-x)+gy*(yy-y)-z)/err)[g]
+    fit=least_squares(resid,[amp,0,0,bg,0,0],bounds=([0,-5,-5,-np.inf,-np.inf,-np.inf],[np.inf,5,5,np.inf,np.inf,np.inf]))
+    v=offset(center,sky(w,x+fit.x[1],y+fit.x[2]))
+    print('TARGET_EPSF',json.dumps(dict(filename=name,filter=filt,east=float(v[0]),north=float(v[1]),flux=float(fit.x[0]),valid=bool(fit.success and not np.any(fit.active_mask)),chi2=float(2*fit.cost),dof=int(g.sum()-6))),flush=True)
     rng=np.random.default_rng(639188)
     rows=[]
     for j in range(48):
@@ -215,7 +224,7 @@ def main():
                     sigma={'F125W':.55,'F140W':.60,'F160W':.65}[filt]
                     ff,vv=scan(a,e,d,w,center,grid,sigma);sn=combined([(ff,vv)])
                     i=np.nanargmax(sn);row.update(status='pixel_likelihood',max_snr=float(sn[i]),dx_arcsec=grid[i,0],dy_arcsec=grid[i,1],flux_native=float(ff[i]),flux_sigma_native=float(np.sqrt(vv[i])),boundary=bool(np.max(abs(grid[i]))>.56))
-                    injection_audit(a,e,d,w,center,sigma,float(ff[i]),filt,name)
+                    injection_audit(a,e,d,w,center.spherical_offsets_by(grid[i,0]*u.arcsec,grid[i,1]*u.arcsec),sigma,float(ff[i]),filt,name)
                     key=(date,filt,bool(row['registered']))
                     np.savez_compressed(OUT/f'{name}_likelihood.npz',grid=grid,flux=ff,variance=vv)
                     groups[key].append((ff,vv))
